@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { saveCredentials } from "@/lib/auth";
 import { api } from "@/lib/api";
+import { Logo } from "@/components/ui/logo";
 
 interface Props {
   onLogin: () => void;
@@ -31,11 +32,8 @@ export default function LoginPage({ onLogin }: Props) {
     <div className="phone-frame">
       <div className="flex flex-col h-full justify-center px-6 py-10">
         <div className="flex justify-center mb-6">
-          <img src="/logo.webp" alt="Kaasu Logo" className="w-24 h-24 object-contain" />
+          <Logo />
         </div>
-        <h1 className="sketch-title text-2xl mb-2 text-center">Kaasu</h1>
-        <p className="text-sm text-gray-500 mb-8 text-center">Enter your WordPress credentials</p>
-
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="sketch-field">
             <label className="field-label">Username</label>

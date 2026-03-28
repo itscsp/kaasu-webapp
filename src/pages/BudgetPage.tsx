@@ -46,12 +46,11 @@ export default function BudgetPage({
   }, [budgetId]);
 
   async function handleDelete(tid: number) {
-    if (!confirm("Delete this transaction?")) return;
     try {
       await api.transactions.delete(budgetId, tid);
       reload();
-    } catch {
-      alert("Failed to delete transaction");
+    } catch (error) {
+      console.error("Failed to delete transaction:", error);
     }
   }
 
