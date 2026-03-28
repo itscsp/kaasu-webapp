@@ -1,0 +1,421 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --font-sans: var(--app-font-sans);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+}
+
+:root {
+  --background: 0 0% 98%;
+  --foreground: 0 0% 8%;
+  --border: 0 0% 20%;
+  --input: 0 0% 20%;
+  --ring: 0 0% 20%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 8%;
+  --primary: 0 0% 10%;
+  --primary-foreground: 0 0% 98%;
+  --muted: 0 0% 94%;
+  --muted-foreground: 0 0% 40%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --app-font-sans: 'Roboto', sans-serif;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--app-font-sans);
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    min-height: 100dvh;
+  }
+}
+
+
+/* ── App shell ── */
+.app-shell {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 100dvh;
+  background: hsl(0 0% 93%);
+  padding: 0;
+}
+
+/* ── Phone frame ── */
+.phone-frame {
+  width: 100%;
+  max-width: 390px;
+  min-height: 100dvh;
+  background: hsl(0 0% 100%);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-left: 1.5px solid hsl(0 0% 20%);
+  border-right: 1.5px solid hsl(0 0% 20%);
+}
+
+@media (min-width: 640px) {
+  .app-shell {
+    padding: 24px 16px;
+    align-items: center;
+  }
+
+  .phone-frame {
+    min-height: min(100dvh - 48px, 820px);
+    max-height: min(100dvh - 48px, 820px);
+    border: 2px solid hsl(0 0% 20%);
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 3px 4px 0px 0px hsl(0 0% 20%);
+  }
+}
+
+/* ── Screen header ── */
+.screen-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1.5px solid hsl(0 0% 20%);
+  flex-shrink: 0;
+}
+
+.header-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.header-action-btn {
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: hsl(0 0% 20%);
+  min-width: 48px;
+  text-align: center;
+}
+
+/* ── Tabs ── */
+.tab-bar {
+  display: flex;
+  border-bottom: 1.5px solid hsl(0 0% 20%);
+  flex-shrink: 0;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 8px 4px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: hsl(0 0% 40%);
+  border-right: 1px solid hsl(0 0% 85%);
+  transition: background 0.1s;
+}
+
+.tab-btn:last-child {
+  border-right: none;
+}
+
+.tab-btn-active {
+  color: hsl(0 0% 10%);
+  font-weight: 600;
+  background: hsl(0 0% 96%);
+}
+
+/* ── Summary bar ── */
+.summary-bar {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 8px;
+  background: hsl(0 0% 97%);
+  border-bottom: 1.5px solid hsl(0 0% 20%);
+  flex-shrink: 0;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+
+.summary-label {
+  font-size: 0.65rem;
+  color: hsl(0 0% 50%);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summary-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.summary-value.income {
+  color: hsl(142 71% 35%);
+}
+
+.summary-value.expenses {
+  color: hsl(0 72% 51%);
+}
+
+/* ── Screen body (scrollable) ── */
+.screen-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Bottom tab bar ── */
+.bottom-tab-bar {
+  display: flex;
+  border-top: 1.5px solid hsl(0 0% 20%);
+  flex-shrink: 0;
+}
+
+.bottom-tab {
+  flex: 1;
+  padding: 10px 4px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: hsl(0 0% 40%);
+  border-right: 1px solid hsl(0 0% 85%);
+}
+
+.bottom-tab:last-child {
+  border-right: none;
+}
+
+.bottom-tab.active {
+  font-weight: 600;
+  color: hsl(0 0% 10%);
+}
+
+/* ── Transaction items ── */
+.transaction-item {
+  border: 1.5px solid hsl(0 0% 20%);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.transaction-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.transaction-date-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid hsl(0 0% 20%);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.transaction-amount {
+  font-size: 1rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+.transaction-detail {
+  padding: 8px 12px 12px;
+  border-top: 1px solid hsl(0 0% 88%);
+  background: hsl(0 0% 98%);
+}
+
+/* ── Archive rows ── */
+.archive-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: 1.5px solid hsl(0 0% 20%);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: background 0.1s;
+}
+
+.archive-row:hover {
+  background: hsl(0 0% 97%);
+}
+
+.archive-row-title {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* ── Sketch form elements ── */
+.sketch-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field-label {
+  font-size: 0.8rem;
+  color: hsl(0 0% 40%);
+  margin-bottom: 2px;
+}
+
+.sketch-input,
+.sketch-select,
+.sketch-textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 1rem;
+  padding: 10px 12px;
+  border: 1.5px solid hsl(0 0% 20%);
+  border-radius: 8px;
+  background: hsl(0 0% 100%);
+  color: hsl(0 0% 10%);
+  outline: none;
+  transition: border-color 0.15s;
+  appearance: auto;
+}
+
+.sketch-input:focus,
+.sketch-select:focus,
+.sketch-textarea:focus {
+  border-color: hsl(0 0% 5%);
+}
+
+.sketch-textarea {
+  resize: vertical;
+}
+
+/* ── Sketch box (generic bordered container) ── */
+.sketch-box {
+  border: 1.5px solid hsl(0 0% 20%);
+  border-radius: 8px;
+  background: hsl(0 0% 100%);
+}
+
+/* ── Buttons ── */
+.sketch-btn {
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+  border: 1.5px solid hsl(0 0% 20%);
+  border-radius: 8px;
+  background: hsl(0 0% 100%);
+  color: hsl(0 0% 10%);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.sketch-btn:hover {
+  background: hsl(0 0% 96%);
+}
+
+.sketch-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sketch-btn-primary {
+  background: hsl(0 0% 10%);
+  color: hsl(0 0% 98%);
+  border-color: hsl(0 0% 5%);
+}
+
+.sketch-btn-primary:hover {
+  background: hsl(0 0% 20%);
+}
+
+.sketch-btn-danger {
+  border-color: hsl(0 65% 55%);
+  color: hsl(0 72% 51%);
+}
+
+.sketch-btn-danger:hover {
+  background: hsl(0 100% 97%);
+}
+
+/* ── Tag badges ── */
+.tag-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border: 1.5px solid hsl(0 0% 70%);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: hsl(0 0% 35%);
+  background: hsl(0 0% 97%);
+  user-select: none;
+}
+
+button.tag-badge {
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+button.tag-badge:hover {
+  border-color: hsl(0 0% 40%);
+  color: hsl(0 0% 10%);
+}
+
+.tag-badge-selected {
+  border-color: hsl(0 0% 10%);
+  background: hsl(0 0% 10%);
+  color: hsl(0 0% 98%);
+}
+
+/* ── Sketch title ── */
+.sketch-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
