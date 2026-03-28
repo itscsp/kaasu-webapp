@@ -1,4 +1,4 @@
-const BASE_URL = "/wp-api";
+const BASE_URL = import.meta.env.VITE_WP_API_URL ?? "/wp-api";
 
 let authHeader: string | null = null;
 
