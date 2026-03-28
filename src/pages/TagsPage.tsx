@@ -10,6 +10,8 @@ export default function TagsPage({ onBack }: Props) {
   const [tags, setTags] = useState<Tag[]>([]);
   const [newTag, setNewTag] = useState("");
   const [loading, setLoading] = useState(true);
+  const [deleted, setDeleted] = useState(false);
+
   const [error, setError] = useState("");
 
   function reload() {
@@ -43,7 +45,6 @@ export default function TagsPage({ onBack }: Props) {
   }
 
   async function handleDelete(id: number) {
-    if (!confirm("Delete this tag?")) return;
     try {
       await api.tags.delete(id);
       setTags((prev) => prev.filter((t) => t.id !== id));
@@ -82,8 +83,9 @@ export default function TagsPage({ onBack }: Props) {
           tags.map((tag) => (
             <div key={tag.id} className="flex items-center justify-between sketch-box px-3 py-2 mb-2">
               <span className="text-sm font-medium">{tag.name}</span>
+              {deleted ? ("Are you sure?") : false}
               <button
-                onClick={() => handleDelete(tag.id)}
+                onClick={() => deleted ? handleDelete(tag.id) : setDeleted(true)}
                 className="text-gray-400 hover:text-red-500"
               >
                 <X size={14} />

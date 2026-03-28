@@ -10,6 +10,8 @@ interface Props {
 
 export default function TransactionItem({ transaction, onEdit, onDelete }: Props) {
   const [expanded, setExpanded] = useState(false);
+  const [deleted, setDeleted] = useState(false);
+
 
   const sign = transaction.type === "income" ? "+" : "-";
   const dateObj = new Date(transaction.date);
@@ -56,12 +58,19 @@ export default function TransactionItem({ transaction, onEdit, onDelete }: Props
             >
               Update
             </button>
-            <button
-              className="sketch-btn sketch-btn-danger flex-1"
-              onClick={() => onDelete(transaction.id)}
-            >
-              Delete
-            </button>
+            {deleted ?
+              (<button
+                className="sketch-btn sketch-btn-danger flex-1"
+                onClick={() => onDelete(transaction.id)}
+              >Are you sure?
+              </button>) :
+              (<button
+                className="sketch-btn sketch-btn-danger flex-1"
+                onClick={() => setDeleted(true)}
+              >
+                Delete
+              </button>)
+            }
           </div>
         </div>
       )}
