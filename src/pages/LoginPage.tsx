@@ -4,7 +4,7 @@ import { api } from "@/lib/api";
 import { Logo } from "@/components/ui/logo";
 
 interface Props {
-  onLogin: () => void;
+  onLogin: (username: string, appPassword: string) => void;
 }
 
 export default function LoginPage({ onLogin }: Props) {
@@ -17,10 +17,11 @@ export default function LoginPage({ onLogin }: Props) {
     e.preventDefault();
     setError("");
     setLoading(true);
-    saveCredentials(username, appPassword.replace(/\s/g, ""));
+    const cleanPassword = appPassword.replace(/\s/g, "");
+    saveCredentials(username, cleanPassword);
     try {
       await api.budgets.list();
-      onLogin();
+      onLogin(username, cleanPassword);
     } catch {
       setError("Invalid credentials. Please check your username and application password.");
     } finally {
@@ -60,6 +61,12 @@ export default function LoginPage({ onLogin }: Props) {
             <p className="text-xs text-gray-400 mt-1">
               Generate at WordPress › Users › Profile → Application Passwords
             </p>
+          </div>
+
+          {/* Mail hint */}
+          <div className="credentials-hint">
+            <span>💡</span>
+            <span>Get these credentials from your mail</span>
           </div>
 
           {error && (
