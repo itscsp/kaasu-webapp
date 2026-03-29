@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api, Transaction, TransactionBody, Tag } from "@/lib/api";
+import { api, Transaction, TransactionBody } from "@/lib/api";
+import { useData } from "@/context/DataContext";
 import { X, Plus } from "lucide-react";
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function TransactionForm({ budgetId, transaction, onSave, onBack }: Props) {
+  const { tags: allTags, fetchTags, invalidateTags } = useData();
   const isEdit = !!transaction;
   const [type, setType] = useState<"income" | "expenses" | "loan">(
     transaction?.type || "expenses"
@@ -22,9 +24,8 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
   const [date, setDate] = useState(
     transaction?.date || new Date().toISOString().split("T")[0]
   );
-  const [allTags, setAllTags] = useState<Tag[]>([]);
   const [selectedTags, setSelectedTags] = useState<number[]>(
-    transaction?.tags?.map((t) => t.id) || []
+    transaction?.tags || []
   );
   const [newTagName, setNewTagName] = useState("");
   const [creatingTag, setCreatingTag] = useState(false);
@@ -32,8 +33,8 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    api.tags.list().then(setAllTags).catch(() => {});
-  }, []);
+    fetchTags().catch(() => {});
+  }, [fetchTags]);
 
   function toggleTag(id: number) {
     setSelectedTags((prev) =>
@@ -47,7 +48,8 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
     setCreatingTag(true);
     try {
       const created = await api.tags.create(name);
-      setAllTags((prev) => [...prev, created]);
+      invalidateTags();
+      await fetchTags(true);
       setSelectedTags((prev) => [...prev, created.id]);
       setNewTagName("");
     } catch {
@@ -82,7 +84,7 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
     };
     try {
       if (isEdit && transaction) {
-        await api.transactions.update(budgetId, transaction.id, body);
+        await api.transactions.update(budgetId, transaction.id as any, body);
       } else {
         await api.transactions.create(budgetId, body);
       }
@@ -168,7 +170,7 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
             <label className="field-label mb-2 block">Tags</label>
 
             {/* Existing tags to select */}
-            {allTags.length > 0 && (
+            {allTags && allTags.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
                 {allTags.map((tag) => {
                   const selected = selectedTags.includes(tag.id);

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api, Budget } from "@/lib/api";
+
+import { useData } from "@/context/DataContext";
 import { ChevronRight } from "lucide-react";
 
 interface Props {
@@ -8,22 +9,22 @@ interface Props {
 }
 
 export default function ArchivePage({ onSelectBudget, onBack }: Props) {
-  const [budgets, setBudgets] = useState<Budget[]>([]);
+  const { budgets, fetchBudgets } = useData();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    api.budgets
-      .list()
-      .then((data) => {
-        setBudgets(data.slice().reverse());
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Failed to load budgets");
-        setLoading(false);
-      });
-  }, []);
+    fetchBudgets()
+      .catch(() => setError("Failed to load budgets"));
+  }, [fetchBudgets]);
+
+  useEffect(() => {
+    if (budgets !== null) {
+      setLoading(false);
+    }
+  }, [budgets]);
+
+  const sortedBudgets = budgets ? [...budgets].reverse() : [];
 
   return (
     <div className="phone-frame">
@@ -42,13 +43,13 @@ export default function ArchivePage({ onSelectBudget, onBack }: Props) {
         {error && (
           <div className="p-4 text-sm text-red-600">{error}</div>
         )}
-        {!loading && !error && budgets.length === 0 && (
+        {!loading && !error && sortedBudgets.length === 0 && (
           <div className="p-4 text-center text-sm text-gray-500">
             No budgets found
           </div>
         )}
         {!loading &&
-          budgets.map((b) => (
+          sortedBudgets.map((b) => (
             <button
               key={b.id}
               className="archive-row"

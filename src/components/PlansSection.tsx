@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, Plan } from "@/lib/api";
+import { useData } from "@/context/DataContext";
 import { Pencil, Trash2, Plus, Check, X } from "lucide-react";
 
 interface Props {
@@ -7,7 +8,8 @@ interface Props {
 }
 
 export default function PlansSection({ budgetId }: Props) {
-  const [plans, setPlans] = useState<Plan[]>([]);
+  const { plans: plansCache, fetchPlans, invalidatePlans } = useData();
+  const plans = plansCache[budgetId] || [];
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [newTitle, setNewTitle] = useState("");
@@ -17,23 +19,14 @@ export default function PlansSection({ budgetId }: Props) {
   const [editAmount, setEditAmount] = useState("");
   const [showAdd, setShowAdd] = useState(false);
 
-  function reload() {
+  useEffect(() => {
     setLoading(true);
-    api.plans
-      .list(budgetId)
-      .then((data) => {
-        setPlans(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Failed to load plans");
-        setLoading(false);
-      });
-  }
+    fetchPlans(budgetId).catch(() => setError("Failed to load plans"));
+  }, [budgetId, fetchPlans]);
 
   useEffect(() => {
-    reload();
-  }, [budgetId]);
+    if (plansCache[budgetId]) setLoading(false);
+  }, [plansCache, budgetId]);
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -46,7 +39,8 @@ export default function PlansSection({ budgetId }: Props) {
       setNewTitle("");
       setNewAmount("");
       setShowAdd(false);
-      reload();
+      invalidatePlans(budgetId);
+      await fetchPlans(budgetId, true);
     } catch {
       setError("Failed to create plan");
     }
@@ -67,7 +61,8 @@ export default function PlansSection({ budgetId }: Props) {
         amount: Number(editAmount),
       });
       setEditId(null);
-      reload();
+      invalidatePlans(budgetId);
+      await fetchPlans(budgetId, true);
     } catch {
       setError("Failed to update plan");
     }
@@ -77,7 +72,8 @@ export default function PlansSection({ budgetId }: Props) {
     if (!confirm("Delete this plan?")) return;
     try {
       await api.plans.delete(budgetId, pid);
-      setPlans((prev) => prev.filter((p) => p.id !== pid));
+      invalidatePlans(budgetId);
+      await fetchPlans(budgetId, true);
     } catch {
       setError("Failed to delete plan");
     }

@@ -19,7 +19,16 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`API error ${res.status}: ${text}`);
+    let errorMessage = `API error ${res.status}: ${text}`;
+    try {
+      const parsed = JSON.parse(text);
+      if (parsed.message) {
+        errorMessage = parsed.message;
+      }
+    } catch {
+      // Ignore if not JSON
+    }
+    throw new Error(errorMessage);
   }
   return res.json() as Promise<T>;
 }

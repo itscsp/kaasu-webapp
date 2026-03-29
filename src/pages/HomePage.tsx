@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, Budget } from "@/lib/api";
+import { useData } from "@/context/DataContext";
 import BudgetPage from "./BudgetPage";
 import ArchivePage from "./ArchivePage";
 import TagsPage from "./TagsPage";
@@ -22,28 +23,24 @@ export default function HomePage({ onLogout }: Props) {
   const [error, setError] = useState("");
   const [creatingBudget, setCreatingBudget] = useState(false);
 
-  useEffect(() => {
-    loadCurrentBudget();
-  }, []);
+  const { budgets, fetchBudgets, invalidateBudgets } = useData();
 
-  function loadCurrentBudget() {
+  useEffect(() => {
     setLoading(true);
-    api.budgets
-      .list()
-      .then((budgets) => {
-        if (budgets.length > 0) {
-          const sorted = budgets.sort((a, b) =>
-            new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime()
-          );
-          setCurrentBudget(sorted[0]);
-        }
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Failed to load budgets");
-        setLoading(false);
-      });
-  }
+    fetchBudgets().catch(() => setError("Failed to load budgets"));
+  }, [fetchBudgets]);
+
+  useEffect(() => {
+    if (budgets !== null) {
+      if (budgets.length > 0) {
+        const sorted = [...budgets].sort((a, b) =>
+          new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime()
+        );
+        setCurrentBudget(sorted[0]);
+      }
+      setLoading(false);
+    }
+  }, [budgets]);
 
   async function handleCreateBudget() {
     const now = new Date();
@@ -53,6 +50,8 @@ export default function HomePage({ onLogout }: Props) {
     setCreatingBudget(true);
     try {
       const budget = await api.budgets.create(title);
+      invalidateBudgets();
+      await fetchBudgets(true);
       setCurrentBudget(budget);
     } catch {
       setError("Failed to create budget");

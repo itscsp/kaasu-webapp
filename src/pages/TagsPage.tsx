@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api, Tag } from "@/lib/api";
+import { api } from "@/lib/api";
+import { useData } from "@/context/DataContext";
 import { X, Plus } from "lucide-react";
 
 interface Props {
@@ -7,30 +8,23 @@ interface Props {
 }
 
 export default function TagsPage({ onBack }: Props) {
-  const [tags, setTags] = useState<Tag[]>([]);
+  const { tags, fetchTags, invalidateTags } = useData();
   const [newTag, setNewTag] = useState("");
   const [loading, setLoading] = useState(true);
   const [deleted, setDeleted] = useState(false);
-
   const [error, setError] = useState("");
 
-  function reload() {
-    setLoading(true);
-    api.tags
-      .list()
-      .then((data) => {
-        setTags(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Failed to load tags");
-        setLoading(false);
-      });
-  }
+  useEffect(() => {
+    fetchTags().catch(() => setError("Failed to load tags"));
+  }, [fetchTags]);
 
   useEffect(() => {
-    reload();
-  }, []);
+    if (tags !== null) {
+      setLoading(false);
+    }
+  }, [tags]);
+
+
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -38,7 +32,8 @@ export default function TagsPage({ onBack }: Props) {
     try {
       await api.tags.create(newTag.trim());
       setNewTag("");
-      reload();
+      invalidateTags();
+      await fetchTags(true);
     } catch {
       setError("Failed to create tag");
     }
@@ -47,7 +42,8 @@ export default function TagsPage({ onBack }: Props) {
   async function handleDelete(id: number) {
     try {
       await api.tags.delete(id);
-      setTags((prev) => prev.filter((t) => t.id !== id));
+      invalidateTags();
+      await fetchTags(true);
     } catch {
       setError("Failed to delete tag");
     }
@@ -79,8 +75,7 @@ export default function TagsPage({ onBack }: Props) {
         {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
         {loading && <p className="text-sm text-gray-500">Loading…</p>}
 
-        {!loading &&
-          tags.map((tag) => (
+        {!loading && (tags || []).map((tag) => (
             <div key={tag.id} className="flex items-center justify-between sketch-box px-3 py-2 mb-2">
               <span className="text-sm font-medium">{tag.name}</span>
               {deleted ? ("Are you sure?") : false}
@@ -92,7 +87,7 @@ export default function TagsPage({ onBack }: Props) {
               </button>
             </div>
           ))}
-        {!loading && tags.length === 0 && (
+        {!loading && (tags || []).length === 0 && (
           <p className="text-sm text-gray-400 text-center">No tags yet</p>
         )}
       </div>

@@ -71,7 +71,7 @@ export default function ForgotAppPasswordPage({ onBack }: Props) {
             </div>
 
             {error && (
-              <p className="text-sm text-red-600 sketch-box p-2">{error}</p>
+              <p className="text-sm text-red-600 sketch-box p-2">{error?.message}</p>
             )}
 
             <button

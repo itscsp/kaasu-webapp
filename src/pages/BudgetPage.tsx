@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api, Budget, Transaction, Summary } from "@/lib/api";
+import { api, Transaction } from "@/lib/api";
+import { useData } from "@/context/DataContext";
 import TransactionItem from "@/components/TransactionItem";
 import TransactionForm from "@/components/TransactionForm";
 import PlansSection from "@/components/PlansSection";
@@ -19,36 +20,33 @@ export default function BudgetPage({
   onShowTags,
   isCurrentMonth = false,
 }: Props) {
-  const [budget, setBudget] = useState<Budget | null>(null);
-  const [summary, setSummary] = useState<Summary | null>(null);
+  const { budgetDetails, fetchBudgetDetails, invalidateBudgetDetails } = useData();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>(undefined);
   const [showForm, setShowForm] = useState(false);
   const [activeTab, setActiveTab] = useState<"transactions" | "plans">("transactions");
 
-  function reload() {
+  useEffect(() => {
     setLoading(true);
-    Promise.all([api.budgets.get(budgetId), api.budgets.summary(budgetId)])
-      .then(([b, s]) => {
-        setBudget(b);
-        setSummary(s);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Failed to load budget");
-        setLoading(false);
-      });
-  }
+    fetchBudgetDetails(budgetId)
+      .catch(() => setError("Failed to load budget"));
+  }, [budgetId, fetchBudgetDetails]);
 
   useEffect(() => {
-    reload();
-  }, [budgetId]);
+    if (budgetDetails[budgetId]) {
+      setLoading(false);
+    }
+  }, [budgetDetails, budgetId]);
 
-  async function handleDelete(tid: number) {
+  const budget = budgetDetails[budgetId]?.budget;
+  const summary = budgetDetails[budgetId]?.summary;
+
+  async function handleDelete(tid: string) {
     try {
-      await api.transactions.delete(budgetId, tid);
-      reload();
+      await api.transactions.delete(budgetId, tid as any);
+      invalidateBudgetDetails(budgetId);
+      await fetchBudgetDetails(budgetId, true);
     } catch (error) {
       console.error("Failed to delete transaction:", error);
     }
@@ -59,10 +57,11 @@ export default function BudgetPage({
     setShowForm(true);
   }
 
-  function handleFormSave() {
+  async function handleFormSave() {
     setShowForm(false);
     setEditingTransaction(undefined);
-    reload();
+    invalidateBudgetDetails(budgetId);
+    await fetchBudgetDetails(budgetId, true);
   }
 
   function handleFormBack() {
@@ -97,7 +96,7 @@ export default function BudgetPage({
             setEditingTransaction(undefined);
             setShowForm(true);
           }}
-        ><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus "><path d="M5 12h14"></path><path d="M12 5v14"></path></svg> Add</button>
+        ><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus "><path d="M5 12h14"></path><path d="M12 5v14"></path></svg> Add</button>
 
       </div>
 
