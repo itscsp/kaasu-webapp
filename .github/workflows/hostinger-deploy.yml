@@ -24,14 +24,14 @@ jobs:
       - name: Build Project
         run: bun run build
         env:
-          VITE_WP_API_URL: ${{ secrets.VITE_WP_API_URL }}
+          VITE_WP_API_URL: ${{ secrets.FTP_WP_API_URL }}
 
       - name: Sync files via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: 157.173.216.12
-          username: u392192436.chethanspoojary
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
-          server-dir: /kaasu/
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
           danger-clean-delete: false
