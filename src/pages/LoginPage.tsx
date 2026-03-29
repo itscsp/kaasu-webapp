@@ -5,9 +5,11 @@ import { Logo } from "@/components/ui/logo";
 
 interface Props {
   onLogin: (username: string, appPassword: string) => void;
+  onGoToRegister: () => void;
+  onGoToForgot: () => void;
 }
 
-export default function LoginPage({ onLogin }: Props) {
+export default function LoginPage({ onLogin, onGoToRegister, onGoToForgot }: Props) {
   const [username, setUsername] = useState("");
   const [appPassword, setAppPassword] = useState("");
   const [error, setError] = useState("");
@@ -80,6 +82,23 @@ export default function LoginPage({ onLogin }: Props) {
           >
             {loading ? "Connecting…" : "Connect"}
           </button>
+          
+          <div className="flex flex-col gap-2 mt-4 text-center">
+            <button
+              type="button"
+              onClick={onGoToRegister}
+              className="text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              New user? Create an account
+            </button>
+            <button
+              type="button"
+              onClick={onGoToForgot}
+              className="text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              Forgot Application Password?
+            </button>
+          </div>
         </form>
       </div>
     </div>

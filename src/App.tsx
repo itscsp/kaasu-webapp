@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { hasPinSetup, loadCredentials, getStoredCredentials } from "@/lib/auth";
 import LoginPage from "@/pages/LoginPage";
+import RegisterPage from "@/pages/RegisterPage";
+import ForgotAppPasswordPage from "@/pages/ForgotAppPasswordPage";
 import PinSetupPage from "@/pages/PinSetupPage";
 import PinEntryPage from "@/pages/PinEntryPage";
 import HomePage from "@/pages/HomePage";
@@ -8,6 +10,8 @@ import HomePage from "@/pages/HomePage";
 type AuthState =
   | "loading"
   | "credentials"   // no credentials at all → show login form
+  | "register"      // register new user
+  | "forgot-password" // forgot app password
   | "pin-setup"     // credentials validated, no PIN yet → set PIN
   | "pin-entry"     // PIN exists → enter PIN to decrypt
   | "home";         // authenticated
@@ -84,7 +88,17 @@ export default function App() {
   return (
     <div className="app-shell">
       {authState === "credentials" && (
-        <LoginPage onLogin={handleCredentialLogin} />
+        <LoginPage 
+          onLogin={handleCredentialLogin} 
+          onGoToRegister={() => setAuthState("register")}
+          onGoToForgot={() => setAuthState("forgot-password")}
+        />
+      )}
+      {authState === "register" && (
+        <RegisterPage onBack={() => setAuthState("credentials")} />
+      )}
+      {authState === "forgot-password" && (
+        <ForgotAppPasswordPage onBack={() => setAuthState("credentials")} />
       )}
       {authState === "pin-setup" && pendingCreds && (
         <PinSetupPage

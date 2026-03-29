@@ -78,7 +78,26 @@ export interface PlanBody {
   amount: number;
 }
 
+export interface RegisterBody {
+  phone: string;
+  name: string;
+  email: string;
+}
+
 export const api = {
+  auth: {
+    register: (data: RegisterBody) =>
+      request<void>("/auth/register", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    forgotAppPassword: (email: string) =>
+      request<void>("/auth/forgot-app-password", {
+        method: "POST",
+        body: JSON.stringify({ email }),
+      }),
+  },
+
   budgets: {
     list: (year?: number) =>
       request<Budget[]>(`/budgets${year ? `?year=${year}` : ""}`),
