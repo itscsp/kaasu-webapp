@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { hasPinSetup, loadCredentials, getStoredCredentials } from "@/lib/auth";
+import { hasPinSetup, loadCredentials, getStoredCredentials, clearPin } from "@/lib/auth";
 import LoginPage from "@/pages/LoginPage";
 import RegisterPage from "@/pages/RegisterPage";
 import ForgotAppPasswordPage from "@/pages/ForgotAppPasswordPage";
@@ -44,12 +44,13 @@ export default function App() {
   function handleCredentialLogin(username: string, appPassword: string) {
     setPendingCreds({ username, appPassword });
     if (hasPinSetup()) {
-      // PIN already set (returning user who forgot PIN) → skip setup
-      setAuthState("home");
-    } else {
-      // First time → guide through PIN setup
-      setAuthState("pin-setup");
+      // User is logging in with credentials while a PIN is set.
+      // This means they are resetting a forgotten PIN, or swapping users.
+      // Clear the old PIN blob and force them to set a new PIN.
+      clearPin();
     }
+    // Always guide through PIN setup for fresh credential logins
+    setAuthState("pin-setup");
   }
 
   function handlePinSetupComplete() {
