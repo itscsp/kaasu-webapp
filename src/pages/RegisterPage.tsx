@@ -44,7 +44,7 @@ export default function RegisterPage({ onBack }: Props) {
               <p className="text-gray-500 mb-4 whitespace-pre-wrap text-sm">
                 We've sent a magic link to your email. {"\n\n"}
                 1. Click the link in your email to set a password.{"\n"}
-                2. After setting it, you will receive a second email with your Application Password.
+                2. After setting it, you will receive a second email with your App Password.
               </p>
             </div>
 

@@ -25,7 +25,7 @@ export default function LoginPage({ onLogin, onGoToRegister, onGoToForgot }: Pro
       await api.budgets.list();
       onLogin(username, cleanPassword);
     } catch {
-      setError("Invalid credentials. Please check your username and application password.");
+      setError("Invalid credentials. Please check your phone number and app password.");
     } finally {
       setLoading(false);
     }
@@ -51,7 +51,7 @@ export default function LoginPage({ onLogin, onGoToRegister, onGoToForgot }: Pro
           </div>
 
           <div className="sketch-field">
-            <label className="field-label">Application Password</label>
+            <label className="field-label">App Password</label>
             <input
               className="sketch-input"
               type="password"
@@ -94,7 +94,7 @@ export default function LoginPage({ onLogin, onGoToRegister, onGoToForgot }: Pro
               onClick={onGoToForgot}
               className="text-sm text-gray-400 hover:text-black cursor-pointer transition-colors"
             >
-              Forgot Application Password?
+              Forgot App Password?
             </button>
           </div>
         </form>

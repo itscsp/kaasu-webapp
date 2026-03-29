@@ -40,7 +40,7 @@ export default function ForgotAppPasswordPage({ onBack }: Props) {
             <div className="sketch-box p-6 bg-green-50/10 border-green-500/30">
               <h2 className="text-xl font-bold mb-4">Email Sent!</h2>
               <p className="text-gray-500 mb-4 whitespace-pre-wrap text-sm">
-                If an account exists with that email, we've sent you an email with your new Application Password.
+                If an account exists with that email, we've sent you an email with your new App Password.
               </p>
             </div>
 
