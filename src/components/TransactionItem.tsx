@@ -5,7 +5,7 @@ import { Transaction, Tag } from "@/lib/api";
 interface Props {
   transaction: Transaction;
   onEdit: (t: Transaction) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 export default function TransactionItem({ transaction, onEdit, onDelete }: Props) {
@@ -42,9 +42,9 @@ export default function TransactionItem({ transaction, onEdit, onDelete }: Props
           {transaction.description && (
             <p className="text-sm text-gray-600 mb-1">{transaction.description}</p>
           )}
-          {transaction.tags && transaction.tags.length > 0 && (
+          {transaction.tag_objects && transaction.tag_objects.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-2">
-              {transaction.tags.map((tag: Tag) => (
+              {transaction.tag_objects.map((tag: Tag) => (
                 <span key={tag.id} className="tag-badge">
                   {tag.name}
                 </span>

@@ -27,6 +27,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 export interface Budget {
   id: number;
   title: string;
+  author: number;
   date: string;
   transactions?: Transaction[];
   plans?: Plan[];
@@ -34,13 +35,14 @@ export interface Budget {
 }
 
 export interface Transaction {
-  id: number;
+  id: string; // UUID
   date: string;
   amount: number;
   type: "income" | "expenses" | "loan";
   title?: string;
   description?: string;
-  tags?: Tag[];
+  tags?: number[];        // array of tag IDs
+  tag_objects?: Tag[];   // full tag details
 }
 
 export interface Plan {
@@ -52,6 +54,7 @@ export interface Plan {
 export interface Tag {
   id: number;
   name: string;
+  slug?: string;
 }
 
 export interface Summary {
@@ -67,7 +70,7 @@ export interface TransactionBody {
   type: "income" | "expenses" | "loan";
   title?: string;
   description?: string;
-  tags?: number[];
+  tags?: number[]; // array of tag IDs to attach
 }
 
 export interface PlanBody {
