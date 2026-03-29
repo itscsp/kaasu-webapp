@@ -100,7 +100,7 @@ export default function PinEntryPage({ onSuccess, onForgotPin }: Props) {
             onClick={onForgotPin}
             className="text-sm text-gray-400 underline underline-offset-2 hover:text-gray-600 transition-colors"
           >
-            Forgot PIN? Login with credentials
+            Forgot / Reset PIN? Login with credentials
           </button>
         </div>
       </div>
