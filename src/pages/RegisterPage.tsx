@@ -10,7 +10,7 @@ export default function RegisterPage({ onBack }: Props) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -19,7 +19,7 @@ export default function RegisterPage({ onBack }: Props) {
     e.preventDefault();
     setError("");
     setLoading(true);
-    
+
     try {
       await api.auth.register({ name, phone, email });
       setSuccess(true);
@@ -36,18 +36,18 @@ export default function RegisterPage({ onBack }: Props) {
         <div className="flex justify-center mb-6">
           <Logo />
         </div>
-        
+
         {success ? (
           <div className="flex flex-col gap-6 text-center">
             <div className="sketch-box p-6 bg-green-50/10 border-green-500/30">
               <h2 className="text-xl font-bold mb-4">Registration Successful!</h2>
-              <p className="text-gray-300 mb-4 whitespace-pre-wrap text-sm">
+              <p className="text-gray-500 mb-4 whitespace-pre-wrap text-sm">
                 We've sent a magic link to your email. {"\n\n"}
                 1. Click the link in your email to set a password.{"\n"}
                 2. After setting it, you will receive a second email with your Application Password.
               </p>
             </div>
-            
+
             <button
               onClick={onBack}
               className="sketch-btn sketch-btn-primary"
@@ -106,7 +106,7 @@ export default function RegisterPage({ onBack }: Props) {
             >
               {loading ? "Registering…" : "Create Account"}
             </button>
-            
+
             <button
               type="button"
               onClick={onBack}

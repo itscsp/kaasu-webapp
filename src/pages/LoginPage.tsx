@@ -60,9 +60,7 @@ export default function LoginPage({ onLogin, onGoToRegister, onGoToForgot }: Pro
               onChange={(e) => setAppPassword(e.target.value)}
               required
             />
-            <p className="text-xs text-gray-400 mt-1">
-              Generate at WordPress › Users › Profile → Application Passwords
-            </p>
+
           </div>
 
           {/* Mail hint */}
@@ -82,19 +80,19 @@ export default function LoginPage({ onLogin, onGoToRegister, onGoToForgot }: Pro
           >
             {loading ? "Connecting…" : "Connect"}
           </button>
-          
+
           <div className="flex flex-col gap-2 mt-4 text-center">
             <button
               type="button"
               onClick={onGoToRegister}
-              className="text-sm text-gray-400 hover:text-white transition-colors"
+              className="text-sm text-gray-400 hover:text-black cursor-pointer transition-colors"
             >
               New user? Create an account
             </button>
             <button
               type="button"
               onClick={onGoToForgot}
-              className="text-sm text-gray-400 hover:text-white transition-colors"
+              className="text-sm text-gray-400 hover:text-black cursor-pointer transition-colors"
             >
               Forgot Application Password?
             </button>

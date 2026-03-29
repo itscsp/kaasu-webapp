@@ -8,7 +8,7 @@ interface Props {
 
 export default function ForgotAppPasswordPage({ onBack }: Props) {
   const [email, setEmail] = useState("");
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -17,7 +17,7 @@ export default function ForgotAppPasswordPage({ onBack }: Props) {
     e.preventDefault();
     setError("");
     setLoading(true);
-    
+
     try {
       await api.auth.forgotAppPassword(email);
       setSuccess(true);
@@ -34,16 +34,16 @@ export default function ForgotAppPasswordPage({ onBack }: Props) {
         <div className="flex justify-center mb-6">
           <Logo />
         </div>
-        
+
         {success ? (
           <div className="flex flex-col gap-6 text-center">
             <div className="sketch-box p-6 bg-green-50/10 border-green-500/30">
               <h2 className="text-xl font-bold mb-4">Email Sent!</h2>
-              <p className="text-gray-300 mb-4 whitespace-pre-wrap text-sm">
+              <p className="text-gray-500 mb-4 whitespace-pre-wrap text-sm">
                 If an account exists with that email, we've sent you an email with your new Application Password.
               </p>
             </div>
-            
+
             <button
               onClick={onBack}
               className="sketch-btn sketch-btn-primary"
@@ -81,11 +81,11 @@ export default function ForgotAppPasswordPage({ onBack }: Props) {
             >
               {loading ? "Requesting…" : "Resend Credentials"}
             </button>
-            
+
             <button
               type="button"
               onClick={onBack}
-              className="mt-2 text-sm text-gray-400 hover:text-white transition-colors"
+              className="mt-2 text-sm text-gray-400 hover:text-black transition-colors"
             >
               Back to Login
             </button>
