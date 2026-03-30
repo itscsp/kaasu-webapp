@@ -11,9 +11,9 @@ interface Props {
 }
 
 export default function TransactionForm({ budgetId, transaction, onSave, onBack }: Props) {
-  const { tags: allTags, fetchTags, invalidateTags } = useData();
+  const { tags: allTags, fetchTags, invalidateTags, accounts: allAccounts, fetchAccounts } = useData();
   const isEdit = !!transaction;
-  const [type, setType] = useState<"income" | "expenses" | "loan">(
+  const [type, setType] = useState<"income" | "expenses" | "transfer">(
     transaction?.type || "expenses"
   );
   const [amount, setAmount] = useState(
@@ -23,6 +23,12 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
   const [description, setDescription] = useState(transaction?.description || "");
   const [date, setDate] = useState(
     transaction?.date || new Date().toISOString().split("T")[0]
+  );
+  const [accountId, setAccountId] = useState<number | "">(
+    transaction?.account_id || ""
+  );
+  const [toAccountId, setToAccountId] = useState<number | "">(
+    transaction?.to_account_id || ""
   );
   const [selectedTags, setSelectedTags] = useState<number[]>(
     transaction?.tags || []
@@ -34,7 +40,8 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
 
   useEffect(() => {
     fetchTags().catch(() => {});
-  }, [fetchTags]);
+    fetchAccounts().catch(() => {});
+  }, [fetchTags, fetchAccounts]);
 
   function toggleTag(id: number) {
     setSelectedTags((prev) =>
@@ -81,6 +88,8 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
       title: title || undefined,
       description: description || undefined,
       tags: selectedTags.length > 0 ? selectedTags : undefined,
+      account_id: accountId ? Number(accountId) : undefined,
+      to_account_id: type === "transfer" && toAccountId ? Number(toAccountId) : undefined,
     };
     try {
       if (isEdit && transaction) {
@@ -114,13 +123,37 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
             <select
               className="sketch-select"
               value={type}
-              onChange={(e) => setType(e.target.value as "income" | "expenses" | "loan")}
+              onChange={(e) => setType(e.target.value as "income" | "expenses" | "transfer")}
             >
               <option value="expenses">Expenses</option>
               <option value="income">Income</option>
-              <option value="loan">Loan</option>
+              <option value="transfer">Transfer</option>
             </select>
           </div>
+
+          <div className="sketch-field">
+            <select
+              className="sketch-select"
+              value={accountId}
+              onChange={e => setAccountId(e.target.value ? Number(e.target.value) : "")}
+            >
+              <option value="">{type === "transfer" ? "Select Source Account" : "Select Account"}</option>
+              {allAccounts?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </select>
+          </div>
+
+          {type === "transfer" && (
+            <div className="sketch-field">
+              <select
+                className="sketch-select"
+                value={toAccountId}
+                onChange={e => setToAccountId(e.target.value ? Number(e.target.value) : "")}
+              >
+                <option value="">Select Destination Account</option>
+                {allAccounts?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+              </select>
+            </div>
+          )}
 
           <div className="sketch-field">
             <input

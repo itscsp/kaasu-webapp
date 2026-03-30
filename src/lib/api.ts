@@ -43,15 +43,25 @@ export interface Budget {
   summary?: Summary;
 }
 
+export interface Account {
+  id: number;
+  name: string;
+  group: "Cash" | "Accounts" | "Investment" | "Loan" | "Insurance" | "Saving";
+  balance: number;
+  description?: string;
+}
+
 export interface Transaction {
   id: string; // UUID
   date: string;
   amount: number;
-  type: "income" | "expenses" | "loan";
+  type: "income" | "expenses" | "transfer";
   title?: string;
   description?: string;
   tags?: number[];        // array of tag IDs
   tag_objects?: Tag[];   // full tag details
+  account_id?: number;
+  to_account_id?: number;
 }
 
 export interface Plan {
@@ -67,19 +77,30 @@ export interface Tag {
 }
 
 export interface Summary {
+  budget_id?: number;
+  month?: string;
   total_income: number;
   total_expenses: number;
-  total_loans: number;
   net_balance: number;
+  accounts: Account[];
 }
 
 export interface TransactionBody {
   date: string;
   amount: number;
-  type: "income" | "expenses" | "loan";
+  type: "income" | "expenses" | "transfer";
   title?: string;
   description?: string;
   tags?: number[]; // array of tag IDs to attach
+  account_id?: number;
+  to_account_id?: number;
+}
+
+export interface AccountBody {
+  name: string;
+  group: "Cash" | "Accounts" | "Investment" | "Loan" | "Insurance" | "Saving";
+  amount: number;
+  description?: string;
 }
 
 export interface PlanBody {
@@ -105,6 +126,23 @@ export const api = {
         method: "POST",
         body: JSON.stringify({ email }),
       }),
+  },
+
+  accounts: {
+    list: () => request<Account[]>("/accounts"),
+    get: (id: number) => request<Account>(`/accounts/${id}`),
+    create: (data: AccountBody) =>
+      request<Account>("/accounts", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    update: (id: number, data: Partial<AccountBody>) =>
+      request<Account>(`/accounts/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }),
+    delete: (id: number) =>
+      request<void>(`/accounts/${id}`, { method: "DELETE" }),
   },
 
   budgets: {

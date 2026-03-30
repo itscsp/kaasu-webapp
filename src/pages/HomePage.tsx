@@ -4,6 +4,8 @@ import { useData } from "@/context/DataContext";
 import BudgetPage from "./BudgetPage";
 import ArchivePage from "./ArchivePage";
 import TagsPage from "./TagsPage";
+import AccountsPage from "./AccountsPage";
+import ProfilePage from "./ProfilePage";
 import { clearCredentials } from "@/lib/auth";
 
 interface Props {
@@ -14,7 +16,9 @@ type View =
   | { type: "current" }
   | { type: "budget"; id: number }
   | { type: "archive" }
-  | { type: "tags" };
+  | { type: "tags" }
+  | { type: "accounts" }
+  | { type: "profile" };
 
 export default function HomePage({ onLogout }: Props) {
   const [view, setView] = useState<View>({ type: "current" });
@@ -77,13 +81,25 @@ export default function HomePage({ onLogout }: Props) {
   if (view.type === "tags") {
     return (
       <TagsPage
-        onBack={() => {
-          if (currentBudget) {
-            setView({ type: "current" });
-          } else {
-            setView({ type: "current" });
-          }
-        }}
+        onBack={() => setView({ type: "profile" })}
+      />
+    );
+  }
+
+  if (view.type === "accounts") {
+    return (
+      <AccountsPage
+        onBack={() => setView({ type: "current" })}
+      />
+    );
+  }
+
+  if (view.type === "profile") {
+    return (
+      <ProfilePage
+        onBack={() => setView({ type: "current" })}
+        onShowTags={() => setView({ type: "tags" })}
+        onLogout={handleLogout}
       />
     );
   }
@@ -94,7 +110,8 @@ export default function HomePage({ onLogout }: Props) {
         budgetId={view.id}
         onBack={() => setView({ type: "archive" })}
         onShowArchive={() => setView({ type: "archive" })}
-        onShowTags={() => setView({ type: "tags" })}
+        onShowAccounts={() => setView({ type: "accounts" })}
+        onShowProfile={() => setView({ type: "profile" })}
         isCurrentMonth={false}
       />
     );
@@ -128,9 +145,6 @@ export default function HomePage({ onLogout }: Props) {
       <div className="phone-frame">
         <div className="screen-header">
           <span className="header-title">Budget Tracker</span>
-          <button onClick={handleLogout} className="header-action-btn text-xs">
-            Logout
-          </button>
         </div>
         <div className="flex flex-col items-center justify-center flex-1 gap-4 p-6">
           <p className="text-sm text-gray-500 text-center">
@@ -153,7 +167,8 @@ export default function HomePage({ onLogout }: Props) {
       budgetId={currentBudget.id}
       onBack={handleLogout}
       onShowArchive={() => setView({ type: "archive" })}
-      onShowTags={() => setView({ type: "tags" })}
+      onShowAccounts={() => setView({ type: "accounts" })}
+      onShowProfile={() => setView({ type: "profile" })}
       isCurrentMonth={true}
     />
   );

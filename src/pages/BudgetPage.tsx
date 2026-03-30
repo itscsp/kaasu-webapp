@@ -9,7 +9,8 @@ interface Props {
   budgetId: number;
   onBack: () => void;
   onShowArchive: () => void;
-  onShowTags: () => void;
+  onShowAccounts: () => void;
+  onShowProfile: () => void;
   isCurrentMonth?: boolean;
 }
 
@@ -17,7 +18,8 @@ export default function BudgetPage({
   budgetId,
   onBack,
   onShowArchive,
-  onShowTags,
+  onShowAccounts,
+  onShowProfile,
   isCurrentMonth = false,
 }: Props) {
   const { budgetDetails, fetchBudgetDetails, invalidateBudgetDetails } = useData();
@@ -80,7 +82,9 @@ export default function BudgetPage({
     );
   }
 
-  const transactions = budget?.transactions || [];
+  const transactions = [...(budget?.transactions || [])].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
 
   return (
     <div className="phone-frame">
@@ -133,12 +137,6 @@ export default function BudgetPage({
         >
           Plans
         </button>
-        <button
-          className="tab-btn"
-          onClick={onShowTags}
-        >
-          Tags
-        </button>
       </div>
 
       <div className="screen-body">
@@ -175,6 +173,12 @@ export default function BudgetPage({
           <button className="bottom-tab active">{budget?.title?.split(" ")[0]}</button>
           <button className="bottom-tab" onClick={onShowArchive}>
             Archive
+          </button>
+          <button className="bottom-tab" onClick={onShowAccounts}>
+            Accounts
+          </button>
+          <button className="bottom-tab" onClick={onShowProfile}>
+            Profile
           </button>
         </div>
       )}

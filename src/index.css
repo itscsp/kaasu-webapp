@@ -24,18 +24,18 @@
 }
 
 :root {
-  --background: 0 0% 98%;
-  --foreground: 0 0% 8%;
-  --border: 0 0% 20%;
-  --input: 0 0% 20%;
-  --ring: 0 0% 20%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 8%;
-  --primary: 0 0% 10%;
-  --primary-foreground: 0 0% 98%;
-  --muted: 0 0% 94%;
-  --muted-foreground: 0 0% 40%;
-  --destructive: 0 72% 51%;
+  --background: 224 15% 8%;
+  --foreground: 210 40% 98%;
+  --border: 224 14% 16%;
+  --input: 224 14% 16%;
+  --ring: 224 14% 20%;
+  --card: 224 15% 12%;
+  --card-foreground: 210 40% 98%;
+  --primary: 175 66% 42%;
+  --primary-foreground: 210 40% 98%;
+  --muted: 224 14% 14%;
+  --muted-foreground: 215 20% 65%;
+  --destructive: 0 72% 60%;
   --destructive-foreground: 0 0% 98%;
   --app-font-sans: 'Roboto', sans-serif;
   --radius: 0.5rem;
@@ -63,36 +63,35 @@
   align-items: flex-start;
   justify-content: center;
   min-height: 100dvh;
-  background: hsl(0 0% 93%);
+  background: hsl(var(--background));
   padding: 0;
 }
 
 /* ── Phone frame ── */
 .phone-frame {
   width: 100%;
-  max-width: 390px;
+  max-width: 600px;
   min-height: 100dvh;
-  background: hsl(0 0% 100%);
+  background: hsl(var(--background));
   display: flex;
   flex-direction: column;
   position: relative;
-  border-left: 1.5px solid hsl(0 0% 20%);
-  border-right: 1.5px solid hsl(0 0% 20%);
+  border-left: 1px solid hsl(var(--border));
+  border-right: 1px solid hsl(var(--border));
 }
 
 @media (min-width: 640px) {
   .app-shell {
-    padding: 24px 16px;
-    align-items: center;
+    padding: 0;
+    align-items: stretch;
   }
 
   .phone-frame {
-    min-height: min(100dvh - 48px, 820px);
-    max-height: min(100dvh - 48px, 820px);
-    border: 2px solid hsl(0 0% 20%);
-    border-radius: 28px;
+    min-height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
     overflow: hidden;
-    box-shadow: 3px 4px 0px 0px hsl(0 0% 20%);
+    box-shadow: none;
   }
 }
 
@@ -117,7 +116,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: hsl(0 0% 20%);
+  color: hsl(var(--muted-foreground));
   min-width: 48px;
   text-align: center;
 }
@@ -125,21 +124,22 @@
 /* ── Tabs ── */
 .tab-bar {
   display: flex;
-  border-bottom: 1.5px solid hsl(0 0% 20%);
+  border-bottom: 1px solid hsl(var(--border));
   flex-shrink: 0;
 }
 
 .tab-btn {
   flex: 1;
-  padding: 8px 4px;
+  padding: 10px 4px;
   font-family: inherit;
   font-size: 0.85rem;
   background: none;
   border: none;
   cursor: pointer;
-  color: hsl(0 0% 40%);
-  border-right: 1px solid hsl(0 0% 85%);
-  transition: background 0.1s;
+  color: hsl(var(--muted-foreground));
+  border-right: 1px solid hsl(var(--border));
+  border-bottom: 2px solid transparent;
+  transition: all 0.1s;
 }
 
 .tab-btn:last-child {
@@ -147,9 +147,9 @@
 }
 
 .tab-btn-active {
-  color: hsl(0 0% 10%);
+  color: hsl(var(--foreground));
   font-weight: 600;
-  background: hsl(0 0% 96%);
+  border-bottom: 2px solid hsl(var(--foreground));
 }
 
 /* ── Summary bar ── */
@@ -157,7 +157,7 @@
   display: flex;
   justify-content: space-around;
   padding: 10px 8px;
-  border-bottom: 1.5px solid hsl(0 0% 20%);
+  border-bottom: 1px solid hsl(var(--border));
   flex-shrink: 0;
 }
 
@@ -170,9 +170,10 @@
 
 .summary-label {
   font-size: 0.65rem;
-  color: hsl(0 0% 50%);
+  color: hsl(var(--muted-foreground));
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  margin-bottom: 4px;
 }
 
 .summary-value {
@@ -181,11 +182,11 @@
 }
 
 .summary-value.income {
-  color: hsl(142 71% 35%);
+  color: hsl(var(--primary));
 }
 
 .summary-value.expenses {
-  color: hsl(0 72% 51%);
+  color: hsl(var(--destructive));
 }
 
 /* ── Screen body (scrollable) ── */
@@ -199,25 +200,25 @@
 /* ── Bottom tab bar ── */
 .bottom-tab-bar {
   display: flex;
-  border-top: 1.5px solid hsl(0 0% 20%);
+  border-top: 1px solid hsl(var(--border));
   flex-shrink: 0;
   position: sticky;
   bottom: 0;
-  background: hsl(0 0% 100%);
+  background: hsl(var(--background));
   z-index: 10;
 }
 
 .bottom-tab {
   flex: 1;
-  padding: 12px 4px 16px;
-  /* Added some bottom padding for safe areas */
+  padding: 16px 4px 20px;
   font-family: inherit;
   font-size: 0.9rem;
   background: none;
   border: none;
   cursor: pointer;
-  color: hsl(0 0% 40%);
-  border-right: 1px solid hsl(0 0% 88%);
+  color: hsl(var(--muted-foreground));
+  border-right: 1px solid hsl(var(--border));
+  transition: color 0.15s;
 }
 
 .bottom-tab:last-child {
@@ -226,41 +227,39 @@
 
 .bottom-tab.active {
   font-weight: 600;
-  color: hsl(0 0% 10%);
+  color: hsl(var(--foreground));
 }
 
 /* ── Transaction items ── */
 .transaction-item {
-  border: 1.5px solid hsl(0 0% 20%);
   border-radius: 8px;
   margin-bottom: 8px;
   overflow: hidden;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
 }
 
 .transaction-row {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 5px 12px 5px 5px;
+  gap: 12px;
+  padding: 12px;
   background: none;
   border: none;
   cursor: pointer;
   font-family: inherit;
   text-align: left;
+  color: hsl(var(--foreground));
 }
 
 .transaction-date-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: 1.5px solid hsl(0 0% 20%);
-  border-radius: 6px;
-  font-size: 1.4rem;
-  font-weight: 400;
-  padding: 10px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: hsl(var(--muted-foreground));
   flex-shrink: 0;
 }
 
@@ -271,9 +270,8 @@
 }
 
 .transaction-detail {
-  padding: 8px 12px 12px;
-  border-top: 1px solid hsl(0 0% 88%);
-  background: hsl(0 0% 98%);
+  padding: 0px 12px 12px;
+  background: hsl(var(--card));
 }
 
 /* ── Archive rows ── */
@@ -283,18 +281,19 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 14px;
-  border: 1.5px solid hsl(0 0% 20%);
+  border: 1px solid hsl(var(--border));
   border-radius: 8px;
   margin-bottom: 8px;
-  background: none;
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
   cursor: pointer;
   font-family: inherit;
   text-align: left;
-  transition: background 0.1s;
+  transition: opacity 0.1s;
 }
 
 .archive-row:hover {
-  background: hsl(0 0% 97%);
+  opacity: 0.8;
 }
 
 .archive-row-title {
@@ -310,7 +309,7 @@
 
 .field-label {
   font-size: 0.8rem;
-  color: hsl(0 0% 40%);
+  color: hsl(var(--muted-foreground));
   margin-bottom: 2px;
 }
 
@@ -320,20 +319,24 @@
   width: 100%;
   font-family: inherit;
   font-size: 1rem;
-  padding: 10px 12px;
-  border: 1.5px solid hsl(0 0% 20%);
+  padding: 12px 14px;
+  border: 1px solid hsl(var(--border));
   border-radius: 8px;
-  background: hsl(0 0% 100%);
-  color: hsl(0 0% 10%);
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
   outline: none;
   transition: border-color 0.15s;
-  appearance: auto;
+  appearance: none;
 }
 
 .sketch-input:focus,
 .sketch-select:focus,
 .sketch-textarea:focus {
-  border-color: hsl(0 0% 5%);
+  border-color: hsl(var(--primary));
+}
+
+.sketch-select {
+  appearance: auto;
 }
 
 .sketch-textarea {
@@ -342,9 +345,9 @@
 
 /* ── Sketch box (generic bordered container) ── */
 .sketch-box {
-  border: 1.5px solid hsl(0 0% 20%);
+  border: 1px solid hsl(var(--border));
   border-radius: 8px;
-  background: hsl(0 0% 100%);
+  background: hsl(var(--card));
 }
 
 /* ── Buttons ── */
@@ -352,16 +355,16 @@
   font-family: inherit;
   font-size: 0.9rem;
   padding: 8px 12px;
-  border: 1px solid hsl(0 0% 20%);
+  border: none;
   border-radius: 8px;
-  background: hsl(0 0% 100%);
-  color: hsl(0 0% 10%);
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
   cursor: pointer;
-  transition: background 0.1s;
+  transition: opacity 0.1s;
 }
 
 .sketch-btn:hover {
-  background: hsl(0 0% 96%);
+  opacity: 0.8;
 }
 
 .sketch-btn:disabled {
@@ -370,51 +373,50 @@
 }
 
 .sketch-btn-primary {
-  background: hsl(0 0% 10%);
-  color: hsl(0 0% 98%);
-  border-color: hsl(0 0% 5%);
+  background: hsl(var(--foreground));
+  color: hsl(var(--background));
 }
 
 .sketch-btn-primary:hover {
-  background: hsl(0 0% 20%);
+  background: hsl(var(--foreground));
 }
 
 .sketch-btn-danger {
-  border-color: hsl(0 65% 55%);
-  color: hsl(0 72% 51%);
+  color: hsl(var(--destructive));
+  background: transparent;
+  border: 1px solid hsl(var(--destructive));
 }
 
 .sketch-btn-danger:hover {
-  background: hsl(0 100% 97%);
+  background: rgba(255, 92, 92, 0.1);
 }
 
 /* ── Tag badges ── */
 .tag-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  border: 1.5px solid hsl(0 0% 70%);
+  padding: 4px 12px;
+  border: 1px solid hsl(var(--border));
   border-radius: 20px;
-  font-size: 0.75rem;
-  color: hsl(0 0% 35%);
-  background: hsl(0 0% 97%);
+  font-size: 0.8rem;
+  color: hsl(var(--muted-foreground));
+  background: transparent;
   user-select: none;
 }
 
 button.tag-badge {
   cursor: pointer;
-  transition: background 0.1s, border-color 0.1s;
+  transition: all 0.1s;
 }
 
 button.tag-badge:hover {
-  border-color: hsl(0 0% 40%);
-  color: hsl(0 0% 10%);
+  background: hsl(var(--muted));
 }
 
 .tag-badge-selected {
-  border-color: hsl(0 0% 10%);
-  background: hsl(0 0% 10%);
-  color: hsl(0 0% 98%);
+  border-color: hsl(var(--primary));
+  color: hsl(var(--primary));
+  background: hsla(175, 66%, 42%, 0.1);
 }
 
 /* ── Sketch title ── */
@@ -435,15 +437,14 @@ button.tag-badge:hover {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  border: 2px solid hsl(0 0% 30%);
+  border: 2px solid hsl(var(--border));
   background: transparent;
   transition: background 0.15s, transform 0.1s;
 }
 
 .pin-dot-filled {
-  background: hsl(0 0% 10%);
-  border-color: hsl(0 0% 10%);
-  transform: scale(1.1);
+  background: hsl(var(--muted-foreground));
+  border-color: hsl(var(--muted-foreground));
 }
 
 /* ── PIN keypad ── */
@@ -461,10 +462,10 @@ button.tag-badge:hover {
   font-size: 1.4rem;
   font-weight: 500;
   height: 64px;
-  border: 1.5px solid hsl(0 0% 20%);
+  border: none;
   border-radius: 12px;
-  background: hsl(0 0% 100%);
-  color: hsl(0 0% 10%);
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -475,7 +476,7 @@ button.tag-badge:hover {
 }
 
 .pin-key:active {
-  background: hsl(0 0% 90%);
+  background: hsl(var(--muted));
   transform: scale(0.94);
 }
 
@@ -486,8 +487,8 @@ button.tag-badge:hover {
 
 .pin-key-back {
   font-size: 1.1rem;
-  border-style: dashed;
-  color: hsl(0 0% 40%);
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
 }
 
 /* ── PIN shake animation (wrong PIN) ── */
@@ -512,9 +513,9 @@ button.tag-badge:hover {
   align-items: center;
   gap: 6px;
   font-size: 0.78rem;
-  color: hsl(0 0% 45%);
-  background: hsl(0 0% 96%);
-  border: 1px dashed hsl(0 0% 70%);
+  color: hsl(var(--muted-foreground));
+  background: hsl(var(--muted));
+  border: 1px dashed hsl(var(--border));
   border-radius: 6px;
   padding: 7px 10px;
 }
