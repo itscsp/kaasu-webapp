@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { useData } from "@/context/DataContext";
-import { X, Plus } from "lucide-react";
+import { X, Plus, CheckCircle, Circle } from "lucide-react";
 
 interface Props {
   onBack: () => void;
@@ -11,7 +11,7 @@ export default function TagsPage({ onBack }: Props) {
   const { tags, fetchTags, invalidateTags } = useData();
   const [newTag, setNewTag] = useState("");
   const [loading, setLoading] = useState(true);
-  const [deleted, setDeleted] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -42,10 +42,22 @@ export default function TagsPage({ onBack }: Props) {
   async function handleDelete(id: number) {
     try {
       await api.tags.delete(id);
+      setDeletingId(null);
       invalidateTags();
       await fetchTags(true);
     } catch {
       setError("Failed to delete tag");
+    }
+  }
+
+  async function handleToggleStatus(tag: any) {
+    try {
+      const newStatus = tag.status === "DONE" ? "PENDING" : "DONE";
+      await api.tags.update(tag.id, { status: newStatus });
+      invalidateTags();
+      await fetchTags(true);
+    } catch {
+      setError("Failed to update tag status");
     }
   }
 
@@ -77,14 +89,26 @@ export default function TagsPage({ onBack }: Props) {
 
         {!loading && (tags || []).map((tag) => (
             <div key={tag.id} className="flex items-center justify-between sketch-box px-3 py-2 mb-2">
-              <span className="text-sm font-medium">{tag.name}</span>
-              {deleted ? ("Are you sure?") : false}
-              <button
-                onClick={() => deleted ? handleDelete(tag.id) : setDeleted(true)}
-                className="text-gray-400 hover:text-red-500"
-              >
-                <X size={14} />
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => handleToggleStatus(tag)}
+                  className={tag.status === "DONE" ? "text-green-500" : "text-gray-400 hover:text-white"}
+                >
+                  {tag.status === "DONE" ? <CheckCircle size={16} /> : <Circle size={16} />}
+                </button>
+                <span className={`text-sm font-medium ${tag.status === "DONE" ? "line-through text-gray-500" : ""}`}>
+                  {tag.name}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {deletingId === tag.id && <span className="text-xs text-red-400">Sure?</span>}
+                <button
+                  onClick={() => (deletingId === tag.id ? handleDelete(tag.id) : setDeletingId(tag.id))}
+                  className="text-gray-400 hover:text-red-500"
+                >
+                  <X size={14} />
+                </button>
+              </div>
             </div>
           ))}
         {!loading && (tags || []).length === 0 && (

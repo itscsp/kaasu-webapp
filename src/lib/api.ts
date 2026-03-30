@@ -50,6 +50,8 @@ export interface Account {
   balance?: number;
   amount?: number;
   description?: string;
+  is_connected?: boolean;
+  transaction_count?: number;
 }
 
 export interface Transaction {
@@ -75,6 +77,7 @@ export interface Tag {
   id: number;
   name: string;
   slug?: string;
+  status?: "DONE" | "PENDING";
 }
 
 export interface Summary {
@@ -144,6 +147,8 @@ export const api = {
       }),
     delete: (id: number) =>
       request<void>(`/accounts/${id}`, { method: "DELETE" }),
+    transactions: (id: number) =>
+      request<Transaction[]>(`/accounts/${id}/transactions`),
   },
 
   budgets: {
@@ -208,7 +213,9 @@ export const api = {
   tags: {
     list: () => request<Tag[]>("/tags"),
     create: (name: string) =>
-      request<Tag>("/tags", { method: "POST", body: JSON.stringify({ name }) }),
+      request<Tag>("/tags", { method: "POST", body: JSON.stringify({ name, status: "PENDING" }) }),
+    update: (id: number, data: { name?: string; status?: "DONE" | "PENDING" }) =>
+      request<Tag>(`/tags/${id}`, { method: "PUT", body: JSON.stringify(data) }),
     delete: (id: number) =>
       request<void>(`/tags/${id}`, { method: "DELETE" }),
   },
