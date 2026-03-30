@@ -6,6 +6,7 @@ import ArchivePage from "./ArchivePage";
 import TagsPage from "./TagsPage";
 import AccountsPage from "./AccountsPage";
 import ProfilePage from "./ProfilePage";
+import SummaryPage from "./SummaryPage";
 import { clearCredentials } from "@/lib/auth";
 
 interface Props {
@@ -18,6 +19,7 @@ type View =
   | { type: "archive" }
   | { type: "tags" }
   | { type: "accounts" }
+  | { type: "summary" }
   | { type: "profile" };
 
 export default function HomePage({ onLogout }: Props) {
@@ -94,11 +96,21 @@ export default function HomePage({ onLogout }: Props) {
     );
   }
 
+  if (view.type === "summary") {
+    return (
+      <SummaryPage
+        budgetId={currentBudget?.id}
+        onBack={() => setView({ type: "profile" })}
+      />
+    );
+  }
+
   if (view.type === "profile") {
     return (
       <ProfilePage
         onBack={() => setView({ type: "current" })}
         onShowTags={() => setView({ type: "tags" })}
+        onShowSummary={() => setView({ type: "summary" })}
         onLogout={handleLogout}
       />
     );
