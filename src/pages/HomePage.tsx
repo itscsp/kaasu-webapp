@@ -111,6 +111,7 @@ export default function HomePage({ onLogout }: Props) {
         onBack={() => setView({ type: "current" })}
         onShowTags={() => setView({ type: "tags" })}
         onShowSummary={() => setView({ type: "summary" })}
+        onShowArchive={() => setView({ type: "archive" })}
         onLogout={handleLogout}
       />
     );
@@ -121,7 +122,7 @@ export default function HomePage({ onLogout }: Props) {
       <BudgetPage
         budgetId={view.id}
         onBack={() => setView({ type: "archive" })}
-        onShowArchive={() => setView({ type: "archive" })}
+        onShowSummary={() => setView({ type: "summary" })}
         onShowAccounts={() => setView({ type: "accounts" })}
         onShowProfile={() => setView({ type: "profile" })}
         isCurrentMonth={false}
@@ -178,7 +179,7 @@ export default function HomePage({ onLogout }: Props) {
     <BudgetPage
       budgetId={currentBudget.id}
       onBack={handleLogout}
-      onShowArchive={() => setView({ type: "archive" })}
+      onShowSummary={() => setView({ type: "summary" })}
       onShowAccounts={() => setView({ type: "accounts" })}
       onShowProfile={() => setView({ type: "profile" })}
       isCurrentMonth={true}

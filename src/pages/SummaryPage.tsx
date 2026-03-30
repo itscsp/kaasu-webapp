@@ -73,8 +73,8 @@ export default function SummaryPage({ budgetId, onBack }: Props) {
                         <span className="font-medium text-[hsl(var(--foreground))]">{acc.name}</span>
                         <span className="text-xs text-[hsl(var(--muted-foreground))]">{acc.group}</span>
                       </div>
-                      <span className={`font-semibold ${acc.balance >= 0 ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]"}`}>
-                        ₹{(Number(acc.balance) || 0).toLocaleString()}
+                      <span className={`font-semibold ${(Number(acc.amount ?? acc.balance) || 0) >= 0 ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]"}`}>
+                        ₹{(Number(acc.amount ?? acc.balance) || 0).toLocaleString()}
                       </span>
                     </div>
                   ))}

@@ -4,11 +4,12 @@ import { useData } from "@/context/DataContext";
 import TransactionItem from "@/components/TransactionItem";
 import TransactionForm from "@/components/TransactionForm";
 import PlansSection from "@/components/PlansSection";
+import { BarChart2, Home, Landmark, User } from "lucide-react";
 
 interface Props {
   budgetId: number;
   onBack: () => void;
-  onShowArchive: () => void;
+  onShowSummary: () => void;
   onShowAccounts: () => void;
   onShowProfile: () => void;
   isCurrentMonth?: boolean;
@@ -17,7 +18,7 @@ interface Props {
 export default function BudgetPage({
   budgetId,
   onBack,
-  onShowArchive,
+  onShowSummary,
   onShowAccounts,
   onShowProfile,
   isCurrentMonth = false,
@@ -170,15 +171,21 @@ export default function BudgetPage({
 
       {isCurrentMonth && (
         <div className="bottom-tab-bar">
-          <button className="bottom-tab active">{budget?.title?.split(" ")[0]}</button>
-          <button className="bottom-tab" onClick={onShowArchive}>
-            Archive
+          <button className="bottom-tab active flex flex-col items-center gap-0.5">
+            <Home size={16} />
+            <span className="text-[10px]">{budget?.title?.split(" ")[0]}</span>
           </button>
-          <button className="bottom-tab" onClick={onShowAccounts}>
-            Accounts
+          <button className="bottom-tab flex flex-col items-center gap-0.5" onClick={onShowSummary}>
+            <BarChart2 size={16} />
+            <span className="text-[10px]">Stats</span>
           </button>
-          <button className="bottom-tab" onClick={onShowProfile}>
-            Profile
+          <button className="bottom-tab flex flex-col items-center gap-0.5" onClick={onShowAccounts}>
+            <Landmark size={16} />
+            <span className="text-[10px]">Accounts</span>
+          </button>
+          <button className="bottom-tab flex flex-col items-center gap-0.5" onClick={onShowProfile}>
+            <User size={16} />
+            <span className="text-[10px]">Profile</span>
           </button>
         </div>
       )}

@@ -17,10 +17,9 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
     transaction?.type || "expenses"
   );
   const [amount, setAmount] = useState(
-    transaction ? String(transaction.amount) : ""
+    transaction?.amount ? String(transaction.amount) : ""
   );
-  const [title, setTitle] = useState(transaction?.title || "");
-  const [description, setDescription] = useState(transaction?.description || "");
+  const [notes, setNotes] = useState(transaction?.notes || "");
   const [date, setDate] = useState(
     transaction?.date || new Date().toISOString().split("T")[0]
   );
@@ -85,8 +84,7 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
       date,
       amount: Number(amount),
       type,
-      title: title || undefined,
-      description: description || undefined,
+      notes: notes || undefined,
       tags: selectedTags.length > 0 ? selectedTags : undefined,
       account_id: accountId ? Number(accountId) : undefined,
       to_account_id: type === "transfer" && toAccountId ? Number(toAccountId) : undefined,
@@ -169,21 +167,11 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
           </div>
 
           <div className="sketch-field">
-            <input
-              className="sketch-input"
-              type="text"
-              placeholder="Title (optional)"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
-
-          <div className="sketch-field">
             <textarea
               className="sketch-textarea"
-              placeholder="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               rows={3}
             />
           </div>

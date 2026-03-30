@@ -43,7 +43,7 @@ export default function AccountsPage({ onBack }: Props) {
   function handleEdit(acc: Account) {
     setName(acc.name);
     setGroup(acc.group);
-    setAmount(String(acc.balance)); // showing balance as amount to edit (note: API might have special behavior here)
+    setAmount(String(acc.amount ?? acc.balance ?? 0));
     setDescription(acc.description || "");
     setEditingId(acc.id);
     setShowForm(true);
@@ -166,8 +166,8 @@ export default function AccountsPage({ onBack }: Props) {
                     <span className="text-xs text-gray-400">{acc.description || "No description"}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`font-semibold ${acc.balance >= 0 ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]"}`}>
-                      ₹{acc.balance.toLocaleString()}
+                    <span className={`font-semibold ${(Number(acc.amount ?? acc.balance) || 0) >= 0 ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]"}`}>
+                      ₹{(Number(acc.amount ?? acc.balance) || 0).toLocaleString()}
                     </span>
                     <div className="flex gap-2 text-gray-400 ml-2">
                       <button onClick={() => handleEdit(acc)} className="hover:text-white"><Edit2 size={14}/></button>

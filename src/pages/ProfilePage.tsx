@@ -1,13 +1,14 @@
-import { ChevronRight, LogOut, Tag as TagIcon, BarChart2 } from "lucide-react";
+import { ChevronRight, LogOut, Tag as TagIcon, BarChart2, Archive } from "lucide-react";
 
 interface Props {
   onBack: () => void;
   onShowTags: () => void;
   onShowSummary: () => void;
+  onShowArchive: () => void;
   onLogout: () => void;
 }
 
-export default function ProfilePage({ onBack, onShowTags, onShowSummary, onLogout }: Props) {
+export default function ProfilePage({ onBack, onShowTags, onShowSummary, onShowArchive, onLogout }: Props) {
   return (
     <div className="phone-frame">
       <div className="screen-header">
@@ -36,6 +37,17 @@ export default function ProfilePage({ onBack, onShowTags, onShowSummary, onLogou
             <div className="flex items-center gap-3">
               <TagIcon className="text-[hsl(var(--muted-foreground))]" size={20} />
               <span className="font-medium text-[hsl(var(--foreground))]">Manage Tags</span>
+            </div>
+            <ChevronRight className="text-[hsl(var(--muted-foreground))]" size={20} />
+          </button>
+
+          <button 
+            onClick={onShowArchive}
+            className="flex items-center justify-between p-4 sketch-box hover:opacity-80 transition-opacity"
+          >
+            <div className="flex items-center gap-3">
+              <Archive className="text-[hsl(var(--muted-foreground))]" size={20} />
+              <span className="font-medium text-[hsl(var(--foreground))]">View Archive</span>
             </div>
             <ChevronRight className="text-[hsl(var(--muted-foreground))]" size={20} />
           </button>

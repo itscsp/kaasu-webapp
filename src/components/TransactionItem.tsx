@@ -36,11 +36,8 @@ export default function TransactionItem({ transaction, onEdit, onDelete }: Props
 
       {expanded && (
         <div className="transaction-detail">
-          {transaction.title && (
-            <p className="text-sm font-medium mb-1">{transaction.title}</p>
-          )}
-          {transaction.description && (
-            <p className="text-sm text-gray-600 mb-1">{transaction.description}</p>
+          {transaction.notes && (
+            <p className="text-sm text-gray-400 mb-1">{transaction.notes}</p>
           )}
           {transaction.tag_objects && transaction.tag_objects.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-2">
