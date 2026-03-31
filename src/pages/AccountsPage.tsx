@@ -36,14 +36,14 @@ export default function AccountsPage({ onBack }: Props) {
   }, [accounts]);
 
   useEffect(() => {
-    if (viewingAccount && activeTab === "transactions" && accountTransactions === null) {
+    if (viewingAccount && accountTransactions === null) {
       setTxLoading(true);
       api.accounts.transactions(viewingAccount.id)
         .then(setAccountTransactions)
         .catch(() => {})
         .finally(() => setTxLoading(false));
     }
-  }, [viewingAccount, activeTab, accountTransactions]);
+  }, [viewingAccount, accountTransactions]);
 
   function resetForm() {
     setName("");
