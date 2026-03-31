@@ -61,13 +61,15 @@ export default function SummaryPage({ budgetId, onBack }: Props) {
               </div>
             </div>
 
-            {summary.accounts && summary.accounts.length > 0 && (
+            {summary.accounts && summary.accounts.filter(acc => acc.monthly_change && acc.monthly_change !== 0).length > 0 && (
               <div>
                 <h3 className="text-sm font-semibold text-[hsl(var(--muted-foreground))] uppercase tracking-wider mb-3 px-1">
-                  Account Balances
+                  Active Accounts This Month
                 </h3>
                 <div className="flex flex-col gap-2">
-                  {summary.accounts.map((acc) => (
+                  {summary.accounts
+                    .filter(acc => acc.monthly_change !== undefined && acc.monthly_change !== 0)
+                    .map((acc) => (
                     <div key={acc.id} className="sketch-box p-3 flex flex-col gap-2">
                       <div className="flex justify-between items-start">
                         <div className="flex flex-col">
@@ -82,24 +84,22 @@ export default function SummaryPage({ budgetId, onBack }: Props) {
                         </div>
                       </div>
                       
-                      {acc.monthly_change !== undefined && acc.monthly_change !== 0 && (
-                        <div className="flex justify-between items-center mt-1 pt-2 border-t border-[hsl(var(--border))]">
-                          <span className="text-xs text-[hsl(var(--muted-foreground))]">This Month's Change</span>
-                          <span className={`text-sm font-medium ${acc.monthly_change > 0 ? "text-[hsl(var(--primary))]" : acc.monthly_change < 0 ? "text-[hsl(var(--destructive))]" : "text-[hsl(var(--foreground))]"}`}>
-                            {acc.monthly_change > 0 ? "+" : ""}
-                            ₹{acc.monthly_change.toLocaleString()}
-                          </span>
-                        </div>
-                      )}
+                      <div className="flex justify-between items-center mt-1 pt-2 border-t border-[hsl(var(--border))]">
+                        <span className="text-xs text-[hsl(var(--muted-foreground))]">This Month's Change</span>
+                        <span className={`text-sm font-medium ${acc.monthly_change && acc.monthly_change > 0 ? "text-[hsl(var(--primary))]" : acc.monthly_change && acc.monthly_change < 0 ? "text-[hsl(var(--destructive))]" : "text-[hsl(var(--foreground))]"}`}>
+                          {acc.monthly_change && acc.monthly_change > 0 ? "+" : ""}
+                          ₹{(acc.monthly_change || 0).toLocaleString()}
+                        </span>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
             )}
             
-            {(!summary.accounts || summary.accounts.length === 0) && (
-              <p className="text-center text-sm text-[hsl(var(--muted-foreground))]">
-                No account balances actively tracked.
+            {(!summary.accounts || summary.accounts.filter(acc => acc.monthly_change && acc.monthly_change !== 0).length === 0) && (
+              <p className="text-center text-sm text-[hsl(var(--muted-foreground))] mt-4">
+                No account activity tracked for this month.
               </p>
             )}
           </div>
