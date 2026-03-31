@@ -106,6 +106,30 @@ export default function AccountsPage({ onBack }: Props) {
   }
 
   if (viewingAccount) {
+    const currentBalance = Number(viewingAccount.amount ?? viewingAccount.balance) || 0;
+    let totalRemoved = 0;
+    
+    if (accountTransactions) {
+      accountTransactions.forEach(tx => {
+        let multiplier = 1;
+        const group = viewingAccount.group;
+        if (tx.type === 'transfer') {
+          if (tx.account_id === viewingAccount.id) {
+            multiplier = ['Loan', 'Insurance'].includes(group) ? 1 : -1;
+          } else if (tx.to_account_id === viewingAccount.id) {
+            multiplier = ['Loan', 'Insurance'].includes(group) ? -1 : 1;
+          }
+        } else if (tx.type === 'expenses') {
+          multiplier = ['Investment'].includes(group) ? 1 : -1;
+        } else if (tx.type === 'income') {
+          multiplier = ['Investment'].includes(group) ? -1 : 1;
+        }
+        
+        const impactAmount = Number(tx.amount) * multiplier;
+        if (impactAmount < 0) totalRemoved += Math.abs(impactAmount);
+      });
+    }
+
     return (
       <div className="phone-frame">
         <div className="screen-header">
@@ -146,12 +170,44 @@ export default function AccountsPage({ onBack }: Props) {
                   <span className="text-gray-400 text-sm">Group</span>
                   <span className="font-medium">{viewingAccount.group}</span>
                 </div>
-                <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-gray-400 text-sm">Balance</span>
-                  <span className={`font-semibold ${(Number(viewingAccount.amount ?? viewingAccount.balance) || 0) >= 0 ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]"}`}>
-                    ₹{(Number(viewingAccount.amount ?? viewingAccount.balance) || 0).toLocaleString()}
-                  </span>
-                </div>
+                
+                {['Loan', 'Insurance'].includes(viewingAccount.group) ? (
+                  <>
+                    <div className="flex justify-between border-b border-border pb-2">
+                      <span className="text-gray-400 text-sm">Total loan taken</span>
+                      <span className="font-semibold text-[hsl(var(--destructive))]">
+                        ₹{(currentBalance + totalRemoved).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-b border-border pb-2">
+                      <span className="text-gray-400 text-sm">Total amount paid till now</span>
+                      <span className="font-semibold text-[hsl(var(--primary))]">
+                        ₹{totalRemoved.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-b border-border pb-2">
+                      <span className="text-gray-400 text-sm">Total outstanding</span>
+                      <span className="font-semibold text-[hsl(var(--destructive))]">
+                        ₹{currentBalance.toLocaleString()}
+                      </span>
+                    </div>
+                  </>
+                ) : viewingAccount.group === 'Investment' ? (
+                  <div className="flex justify-between border-b border-border pb-2">
+                    <span className="text-gray-400 text-sm">Total investment</span>
+                    <span className="font-semibold text-[hsl(var(--primary))]">
+                      ₹{currentBalance.toLocaleString()}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex justify-between border-b border-border pb-2">
+                    <span className="text-gray-400 text-sm">Total amount in bank</span>
+                    <span className={`font-semibold ${currentBalance >= 0 ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]"}`}>
+                      ₹{currentBalance.toLocaleString()}
+                    </span>
+                  </div>
+                )}
+                
                 <div className="flex flex-col gap-1">
                   <span className="text-gray-400 text-sm">Description</span>
                   <span className="text-sm">{viewingAccount.description || "No description provided."}</span>
