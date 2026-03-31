@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, Plan } from "@/lib/api";
 import { useData } from "@/context/DataContext";
-import { Pencil, Trash2, Plus, Check, X } from "lucide-react";
+import { Pencil, Trash2, Plus, Check, X, CheckCircle, Circle } from "lucide-react";
 
 interface Props {
   budgetId: number;
@@ -76,6 +76,21 @@ export default function PlansSection({ budgetId }: Props) {
       await fetchPlans(budgetId, true);
     } catch {
       setError("Failed to delete plan");
+    }
+  }
+
+  async function handleToggleStatus(plan: Plan) {
+    try {
+      const newStatus = plan.status === "DONE" ? "PENDING" : "DONE";
+      await api.plans.update(budgetId, plan.id, {
+        title: plan.title,
+        amount: plan.amount,
+        status: newStatus,
+      });
+      invalidatePlans(budgetId);
+      await fetchPlans(budgetId, true);
+    } catch {
+      setError("Failed to update plan status");
     }
   }
 
@@ -168,9 +183,19 @@ export default function PlansSection({ budgetId }: Props) {
             key={plan.id}
             className="sketch-box px-3 py-2 mb-2 flex items-center justify-between"
           >
-            <div>
-              <p className="text-sm font-medium">{plan.title}</p>
-              <p className="text-xs text-gray-500">{(Number(plan.amount) || 0).toLocaleString()}</p>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => handleToggleStatus(plan)}
+                className={plan.status === "DONE" ? "text-green-500" : "text-gray-400 hover:text-white"}
+              >
+                {plan.status === "DONE" ? <CheckCircle size={16} /> : <Circle size={16} />}
+              </button>
+              <div>
+                <p className={`text-sm font-medium ${plan.status === "DONE" ? "line-through text-gray-500" : ""}`}>
+                  {plan.title}
+                </p>
+                <p className="text-xs text-gray-500">{(Number(plan.amount) || 0).toLocaleString()}</p>
+              </div>
             </div>
             <div className="flex gap-2">
               <button

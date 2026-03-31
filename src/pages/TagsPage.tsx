@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { useData } from "@/context/DataContext";
-import { X, Plus, CheckCircle, Circle } from "lucide-react";
+import { X, Plus } from "lucide-react";
 
 interface Props {
   onBack: () => void;
@@ -50,16 +50,7 @@ export default function TagsPage({ onBack }: Props) {
     }
   }
 
-  async function handleToggleStatus(tag: any) {
-    try {
-      const newStatus = tag.status === "DONE" ? "PENDING" : "DONE";
-      await api.tags.update(tag.id, { status: newStatus });
-      invalidateTags();
-      await fetchTags(true);
-    } catch {
-      setError("Failed to update tag status");
-    }
-  }
+
 
   return (
     <div className="phone-frame">
@@ -90,13 +81,7 @@ export default function TagsPage({ onBack }: Props) {
         {!loading && (tags || []).map((tag) => (
             <div key={tag.id} className="flex items-center justify-between sketch-box px-3 py-2 mb-2">
               <div className="flex items-center gap-3">
-                <button
-                  onClick={() => handleToggleStatus(tag)}
-                  className={tag.status === "DONE" ? "text-green-500" : "text-gray-400 hover:text-white"}
-                >
-                  {tag.status === "DONE" ? <CheckCircle size={16} /> : <Circle size={16} />}
-                </button>
-                <span className={`text-sm font-medium ${tag.status === "DONE" ? "line-through text-gray-500" : ""}`}>
+                <span className="text-sm font-medium">
                   {tag.name}
                 </span>
               </div>

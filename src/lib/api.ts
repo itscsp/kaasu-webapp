@@ -71,13 +71,13 @@ export interface Plan {
   id: number;
   title: string;
   amount: number;
+  status?: "DONE" | "PENDING";
 }
 
 export interface Tag {
   id: number;
   name: string;
   slug?: string;
-  status?: "DONE" | "PENDING";
 }
 
 export interface Summary {
@@ -110,6 +110,7 @@ export interface AccountBody {
 export interface PlanBody {
   title: string;
   amount: number;
+  status?: "DONE" | "PENDING";
 }
 
 export interface RegisterBody {
@@ -208,8 +209,8 @@ export const api = {
   tags: {
     list: () => request<Tag[]>("/tags"),
     create: (name: string) =>
-      request<Tag>("/tags", { method: "POST", body: JSON.stringify({ name, status: "PENDING" }) }),
-    update: (id: number, data: { name?: string; status?: "DONE" | "PENDING" }) =>
+      request<Tag>("/tags", { method: "POST", body: JSON.stringify({ name }) }),
+    update: (id: number, data: { name?: string }) =>
       request<Tag>(`/tags/${id}`, { method: "PUT", body: JSON.stringify(data) }),
     delete: (id: number) =>
       request<void>(`/tags/${id}`, { method: "DELETE" }),
