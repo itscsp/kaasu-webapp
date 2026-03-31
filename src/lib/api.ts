@@ -58,6 +58,7 @@ export interface Account {
   name: string;
   group: "Cash" | "Accounts" | "Investment" | "Loan" | "Insurance" | "Saving";
   balance?: number;
+  monthly_change?: number;
   amount?: number;
   description?: string;
   is_connected?: boolean;

@@ -68,14 +68,29 @@ export default function SummaryPage({ budgetId, onBack }: Props) {
                 </h3>
                 <div className="flex flex-col gap-2">
                   {summary.accounts.map((acc) => (
-                    <div key={acc.id} className="sketch-box p-3 flex justify-between items-center">
-                      <div className="flex flex-col">
-                        <span className="font-medium text-[hsl(var(--foreground))]">{acc.name}</span>
-                        <span className="text-xs text-[hsl(var(--muted-foreground))]">{acc.group}</span>
+                    <div key={acc.id} className="sketch-box p-3 flex flex-col gap-2">
+                      <div className="flex justify-between items-start">
+                        <div className="flex flex-col">
+                          <span className="font-medium text-[hsl(var(--foreground))]">{acc.name}</span>
+                          <span className="text-xs text-[hsl(var(--muted-foreground))]">{acc.group}</span>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <span className="text-[10px] text-[hsl(var(--muted-foreground))] uppercase tracking-wider mb-0.5">Overall Balance</span>
+                          <span className={`font-semibold ${(Number(acc.amount ?? acc.balance) || 0) >= 0 ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]"}`}>
+                            ₹{(Number(acc.amount ?? acc.balance) || 0).toLocaleString()}
+                          </span>
+                        </div>
                       </div>
-                      <span className={`font-semibold ${(Number(acc.amount ?? acc.balance) || 0) >= 0 ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]"}`}>
-                        ₹{(Number(acc.amount ?? acc.balance) || 0).toLocaleString()}
-                      </span>
+                      
+                      {acc.monthly_change !== undefined && acc.monthly_change !== 0 && (
+                        <div className="flex justify-between items-center mt-1 pt-2 border-t border-[hsl(var(--border))]">
+                          <span className="text-xs text-[hsl(var(--muted-foreground))]">This Month's Change</span>
+                          <span className={`text-sm font-medium ${acc.monthly_change > 0 ? "text-[hsl(var(--primary))]" : acc.monthly_change < 0 ? "text-[hsl(var(--destructive))]" : "text-[hsl(var(--foreground))]"}`}>
+                            {acc.monthly_change > 0 ? "+" : ""}
+                            ₹{acc.monthly_change.toLocaleString()}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
