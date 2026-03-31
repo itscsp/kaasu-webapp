@@ -41,11 +41,17 @@ export default function TransactionItem({ transaction, onEdit, onDelete }: Props
 
       {expanded && (
         <div className="transaction-detail">
-          {transaction.type === "transfer" && (fromAccount || toAccount) && (
-            <div className="flex items-center gap-2 text-xs text-gray-400 mb-2 bg-black/20 p-2 rounded-md">
-              <span className="truncate max-w-[40%] font-medium text-gray-300">{fromAccount?.name || "Unknown"}</span>
-              <ArrowRight size={12} className="flex-shrink-0" />
-              <span className="truncate max-w-[40%] font-medium text-gray-300">{toAccount?.name || "Unknown"}</span>
+          {(fromAccount || toAccount) && (
+            <div className="flex items-center gap-2 text-xs text-[hsl(var(--muted-foreground))] mb-2 bg-black/20 p-2 rounded-md">
+              {fromAccount && (
+                <span className="truncate max-w-[45%] font-medium text-[hsl(var(--foreground))]">{fromAccount.name}</span>
+              )}
+              {fromAccount && toAccount && (
+                <ArrowRight size={12} className="flex-shrink-0 opacity-50" />
+              )}
+              {toAccount && (
+                <span className="truncate max-w-[45%] font-medium text-[hsl(var(--foreground))]">{toAccount.name}</span>
+              )}
             </div>
           )}
           {transaction.notes && (
