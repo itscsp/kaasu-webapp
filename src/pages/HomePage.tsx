@@ -39,10 +39,17 @@ export default function HomePage({ onLogout }: Props) {
   useEffect(() => {
     if (budgets !== null) {
       if (budgets.length > 0) {
+        const now = new Date();
+        const monthName = now.toLocaleString("default", { month: "long" });
+        const year = now.getFullYear();
+        const currentTitle = `${monthName} ${year}`;
+
         const sorted = [...budgets].sort((a, b) =>
           new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime()
         );
-        setCurrentBudget(sorted[0]);
+        
+        const currentMonthBudget = sorted.find(b => b.title === currentTitle);
+        setCurrentBudget(currentMonthBudget || sorted[0]);
       }
       setLoading(false);
     }

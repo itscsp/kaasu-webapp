@@ -23,7 +23,7 @@ export default function BudgetPage({
   onShowProfile,
   isCurrentMonth = false,
 }: Props) {
-  const { budgetDetails, fetchBudgetDetails, invalidateBudgetDetails } = useData();
+  const { budgetDetails, fetchBudgetDetails, invalidateBudgetDetails, invalidateBudgets, fetchBudgets } = useData();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>(undefined);
@@ -64,7 +64,9 @@ export default function BudgetPage({
     setShowForm(false);
     setEditingTransaction(undefined);
     invalidateBudgetDetails(budgetId);
+    invalidateBudgets();
     await fetchBudgetDetails(budgetId, true);
+    fetchBudgets(true).catch(() => {});
   }
 
   function handleFormBack() {
