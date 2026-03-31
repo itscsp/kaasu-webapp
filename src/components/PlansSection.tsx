@@ -109,6 +109,23 @@ export default function PlansSection({ budgetId }: Props) {
         </button>
       </div>
 
+      {plans.length > 0 && (
+        <div className="sketch-box p-3 mb-4 flex flex-col gap-2">
+          <div className="flex justify-between items-center border-b border-[hsl(var(--border))] pb-2">
+            <span className="text-sm text-[hsl(var(--muted-foreground))]">Paid</span>
+            <span className="font-semibold text-[hsl(var(--primary))]">₹{plans.filter(p => p.status === "DONE").reduce((acc, p) => acc + (Number(p.amount) || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          </div>
+          <div className="flex justify-between items-center border-b border-[hsl(var(--border))] pb-2">
+            <span className="text-sm text-[hsl(var(--muted-foreground))]">Pending</span>
+            <span className="font-semibold text-[hsl(var(--destructive))]">₹{plans.filter(p => p.status !== "DONE").reduce((acc, p) => acc + (Number(p.amount) || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          </div>
+          <div className="flex justify-between items-center pt-1">
+            <span className="text-sm font-medium text-[hsl(var(--foreground))]">Budget</span>
+            <span className="font-bold text-[hsl(var(--foreground))]">₹{plans.reduce((acc, p) => acc + (Number(p.amount) || 0), 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+          </div>
+        </div>
+      )}
+
       {showAdd && (
         <form onSubmit={handleAdd} className="sketch-box p-3 mb-3 flex flex-col gap-2">
           <input
