@@ -2,6 +2,13 @@ const BASE_URL = import.meta.env.VITE_WP_API_URL ?? "/wp-api";
 
 let authHeader: string | null = null;
 
+/** Registered by App.tsx — called whenever the server returns rest_not_logged_in */
+let sessionExpiredCallback: (() => void) | null = null;
+
+export function onSessionExpired(cb: () => void) {
+  sessionExpiredCallback = cb;
+}
+
 export function setAuth(token: string) {
   authHeader = "Bearer " + token;
 }
@@ -24,6 +31,9 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
       const parsed = JSON.parse(text);
       if (parsed.message) {
         errorMessage = parsed.message;
+      }
+      if (parsed.code === "rest_not_logged_in" || res.status === 401) {
+        sessionExpiredCallback?.();
       }
     } catch {
       // Ignore if not JSON

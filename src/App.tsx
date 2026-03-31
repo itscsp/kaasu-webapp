@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { hasPinSetup, loadCredentials, getStoredCredentials, clearPin } from "@/lib/auth";
+import { hasPinSetup, loadCredentials, getStoredCredentials, clearPin, clearCredentials } from "@/lib/auth";
+import { onSessionExpired } from "@/lib/api";
 import LoginPage from "@/pages/LoginPage";
 import PinSetupPage from "@/pages/PinSetupPage";
 import PinEntryPage from "@/pages/PinEntryPage";
@@ -21,6 +22,13 @@ export default function App() {
   const [pendingCreds, setPendingCreds] = useState<PendingCreds | null>(null);
 
   useEffect(() => {
+    // Register 401 / session-expired handler
+    onSessionExpired(() => {
+      clearPin();
+      clearCredentials();
+      setAuthState("credentials");
+    });
+
     if (hasPinSetup()) {
       // Encrypted blob exists → just ask for PIN
       setAuthState("pin-entry");
