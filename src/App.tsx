@@ -96,7 +96,10 @@ export default function App() {
         />
       )}
       {authState === "register" && (
-        <RegisterPage onBack={() => setAuthState("credentials")} />
+        <RegisterPage 
+          onBack={() => setAuthState("credentials")} 
+          onLogin={handleCredentialLogin}
+        />
       )}
       {authState === "forgot-password" && (
         <ForgotAppPasswordPage onBack={() => setAuthState("credentials")} />

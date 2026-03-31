@@ -130,6 +130,11 @@ export const api = {
         method: "POST",
         body: JSON.stringify({ email }),
       }),
+    googleSignIn: (token: string) =>
+      request<{ success: boolean; username: string; app_password: string }>("/auth/google", {
+        method: "POST",
+        body: JSON.stringify({ token }),
+      }),
   },
 
   accounts: {

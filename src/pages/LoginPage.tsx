@@ -2,6 +2,7 @@ import { useState } from "react";
 import { saveCredentials } from "@/lib/auth";
 import { api } from "@/lib/api";
 import { Logo } from "@/components/ui/logo";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 
 interface Props {
   onLogin: (username: string, appPassword: string) => void;
@@ -26,6 +27,26 @@ export default function LoginPage({ onLogin, onGoToRegister, onGoToForgot }: Pro
       onLogin(username, cleanPassword);
     } catch {
       setError("Invalid credentials. Please check your phone number and app password.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleGoogleSuccess(credentialResponse: CredentialResponse) {
+    if (!credentialResponse.credential) return;
+    setError("");
+    setLoading(true);
+    try {
+      const res = await api.auth.googleSignIn(credentialResponse.credential);
+      if (res.success && res.username && res.app_password) {
+        saveCredentials(res.username, res.app_password);
+        await api.budgets.list();
+        onLogin(res.username, res.app_password);
+      } else {
+        setError("Failed to authenticate with Google.");
+      }
+    } catch {
+      setError("Failed to connect with Google. Ensure you have the correct client ID.");
     } finally {
       setLoading(false);
     }
@@ -80,6 +101,19 @@ export default function LoginPage({ onLogin, onGoToRegister, onGoToForgot }: Pro
           >
             {loading ? "Connecting…" : "Connect"}
           </button>
+
+          <div className="flex items-center justify-center gap-2 my-2">
+            <span className="h-px w-full bg-slate-200"></span>
+            <span className="text-sm text-slate-400 font-medium tracking-wide uppercase px-2">OR</span>
+            <span className="h-px w-full bg-slate-200"></span>
+          </div>
+
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError("Google Login Failed")}
+            />
+          </div>
 
           <div className="flex flex-col gap-2 mt-4 text-center">
             <button

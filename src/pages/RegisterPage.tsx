@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { api } from "@/lib/api";
 import { Logo } from "@/components/ui/logo";
+import { saveCredentials } from "@/lib/auth";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 
 interface Props {
   onBack: () => void;
+  onLogin: (username: string, appPassword: string) => void;
 }
 
-export default function RegisterPage({ onBack }: Props) {
+export default function RegisterPage({ onBack, onLogin }: Props) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -25,6 +28,26 @@ export default function RegisterPage({ onBack }: Props) {
       setSuccess(true);
     } catch (err: any) {
       setError(err.message || "Failed to register. Please check your details or try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleGoogleSuccess(credentialResponse: CredentialResponse) {
+    if (!credentialResponse.credential) return;
+    setError("");
+    setLoading(true);
+    try {
+      const res = await api.auth.googleSignIn(credentialResponse.credential);
+      if (res.success && res.username && res.app_password) {
+        saveCredentials(res.username, res.app_password);
+        await api.budgets.list();
+        onLogin(res.username, res.app_password);
+      } else {
+        setError("Failed to register with Google.");
+      }
+    } catch {
+      setError("Failed to connect with Google. Ensure you have the correct client ID.");
     } finally {
       setLoading(false);
     }
@@ -106,6 +129,20 @@ export default function RegisterPage({ onBack }: Props) {
             >
               {loading ? "Registering…" : "Create Account"}
             </button>
+
+            <div className="flex items-center justify-center gap-2 my-2">
+              <span className="h-px w-full bg-slate-200"></span>
+              <span className="text-sm text-slate-400 font-medium tracking-wide uppercase px-2">OR</span>
+              <span className="h-px w-full bg-slate-200"></span>
+            </div>
+
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={() => setError("Google Signup Failed")}
+                text="signup_with"
+              />
+            </div>
 
             <button
               type="button"
