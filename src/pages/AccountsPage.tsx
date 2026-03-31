@@ -232,26 +232,55 @@ export default function AccountsPage({ onBack }: Props) {
               {!txLoading && accountTransactions && accountTransactions.length === 0 && (
                 <p className="text-center text-sm text-gray-500 py-4">No linked transactions.</p>
               )}
-              {!txLoading && accountTransactions && accountTransactions.map(tx => (
-                <div key={tx.id} className="transaction-item mb-2">
-                  <div className="transaction-row !cursor-default">
-                    <div className="transaction-date-badge">{new Date(tx.date).getDate()}</div>
-                    <div className="transaction-amount">
-                      <div className="text-sm font-medium text-foreground">{tx.notes || "No notes"}</div>
-                      <div className={`text-xs ${(tx.type === 'income') ? "text-[hsl(var(--primary))]" : tx.type === 'expenses' ? "text-[hsl(var(--destructive))]" : "text-gray-400"}`}>
-                        {tx.type === 'income' ? '+' : tx.type === 'expenses' ? '-' : ''}₹{Math.abs(Number(tx.amount)).toLocaleString()}
-                      </div>
+              {!txLoading && accountTransactions && accountTransactions.map(tx => {
+                let multiplier = 1;
+                const group = viewingAccount.group;
+                if (tx.type === 'transfer') {
+                  if (tx.account_id === viewingAccount.id) {
+                    multiplier = ['Loan', 'Insurance'].includes(group) ? 1 : -1;
+                  } else if (tx.to_account_id === viewingAccount.id) {
+                    multiplier = ['Loan', 'Insurance'].includes(group) ? -1 : 1;
+                  }
+                } else if (tx.type === 'expenses') {
+                  multiplier = ['Investment'].includes(group) ? 1 : -1;
+                } else if (tx.type === 'income') {
+                  multiplier = ['Investment'].includes(group) ? -1 : 1;
+                }
+                
+                const impactAmount = Number(tx.amount) * multiplier;
+                const sign = impactAmount > 0 ? '+' : impactAmount < 0 ? '-' : '';
+                const colorClass = impactAmount > 0 ? "text-[hsl(var(--primary))]" : impactAmount < 0 ? "text-[hsl(var(--destructive))]" : "text-[hsl(var(--muted-foreground))]";
+                
+                const otherAccountId = tx.account_id === viewingAccount.id ? tx.to_account_id : tx.account_id;
+                const otherAccount = otherAccountId ? accounts?.find(a => a.id === otherAccountId) : null;
+
+                return (
+                <div key={tx.id} className="sketch-box mb-2 overflow-hidden">
+                  <div className="flex items-center p-3">
+                    <div className="transaction-date-badge flex-shrink-0 mr-3">{new Date(tx.date).getDate()}</div>
+                    <div className="flex flex-col flex-grow min-w-0">
+                      <span className="text-sm font-medium text-[hsl(var(--foreground))] truncate">
+                        {tx.notes || (tx.type === 'transfer' ? "Transfer" : "No notes")}
+                      </span>
+                      {otherAccount && (
+                        <span className="text-[10px] text-[hsl(var(--muted-foreground))] mt-0.5 truncate">
+                          {tx.account_id === viewingAccount.id ? "Towards |" : "From |"} {otherAccount.name}
+                        </span>
+                      )}
+                    </div>
+                    <div className={`text-sm font-semibold flex-shrink-0 ml-3 ${colorClass}`}>
+                      {sign}₹{Math.abs(impactAmount).toLocaleString()}
                     </div>
                   </div>
                   {tx.tag_objects && tx.tag_objects.length > 0 && (
-                    <div className="px-3 pb-3 flex flex-wrap gap-1">
+                    <div className="px-3 pb-3 pt-1 flex flex-wrap gap-1 border-t border-[hsl(var(--border))] border-opacity-50">
                       {tx.tag_objects.map((tag: Tag) => (
-                        <span key={tag.id} className="tag-badge text-[10px] py-0.5 px-2">{tag.name}</span>
+                        <span key={tag.id} className="tag-badge text-[10px] py-[2px] px-2">{tag.name}</span>
                       ))}
                     </div>
                   )}
                 </div>
-              ))}
+              )})}
             </div>
           )}
         </div>
