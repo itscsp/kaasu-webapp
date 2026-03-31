@@ -3,12 +3,11 @@ import { encryptCredentials } from "@/lib/auth";
 import { Logo } from "@/components/ui/logo";
 
 interface Props {
-  username: string;
-  appPassword: string;
+  token: string;
   onComplete: () => void;
 }
 
-export default function PinSetupPage({ username, appPassword, onComplete }: Props) {
+export default function PinSetupPage({ token, onComplete }: Props) {
   const [pin, setPin] = useState("");
   const [confirmPin, setConfirmPin] = useState("");
   const [step, setStep] = useState<"enter" | "confirm">("enter");
@@ -51,7 +50,7 @@ export default function PinSetupPage({ username, appPassword, onComplete }: Prop
       return;
     }
     setLoading(true);
-    await encryptCredentials(pin, username, appPassword);
+    await encryptCredentials(pin, token);
     setLoading(false);
     onComplete();
   }

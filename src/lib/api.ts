@@ -2,8 +2,8 @@ const BASE_URL = import.meta.env.VITE_WP_API_URL ?? "/wp-api";
 
 let authHeader: string | null = null;
 
-export function setAuth(username: string, appPassword: string) {
-  authHeader = "Basic " + btoa(`${username}:${appPassword}`);
+export function setAuth(token: string) {
+  authHeader = "Bearer " + token;
 }
 
 export function getAuth() {
@@ -120,18 +120,8 @@ export interface RegisterBody {
 
 export const api = {
   auth: {
-    register: (data: RegisterBody) =>
-      request<void>("/auth/register", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
-    forgotAppPassword: (email: string) =>
-      request<void>("/auth/forgot-app-password", {
-        method: "POST",
-        body: JSON.stringify({ email }),
-      }),
     googleSignIn: (token: string) =>
-      request<{ success: boolean; username: string; app_password: string }>("/auth/google", {
+      request<{ success: boolean; user: { name: string; email: string } }>("/auth/google", {
         method: "POST",
         body: JSON.stringify({ token }),
       }),

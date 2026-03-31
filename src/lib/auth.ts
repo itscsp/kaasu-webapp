@@ -5,17 +5,17 @@ const PIN_KEY = "kaasu_pin_encrypted";
 
 // ── Plain-credential helpers (kept for fallback / first-time setup) ──
 
-export function saveCredentials(username: string, appPassword: string) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ username, appPassword }));
-  setAuth(username, appPassword);
+export function saveCredentials(token: string) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ token }));
+  setAuth(token);
 }
 
 export function loadCredentials(): boolean {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (!stored) return false;
   try {
-    const { username, appPassword } = JSON.parse(stored);
-    setAuth(username, appPassword);
+    const { token } = JSON.parse(stored);
+    setAuth(token);
     return true;
   } catch {
     return false;
@@ -26,7 +26,7 @@ export function clearCredentials() {
   localStorage.removeItem(STORAGE_KEY);
 }
 
-export function getStoredCredentials(): { username: string; appPassword: string } | null {
+export function getStoredCredentials(): { token: string } | null {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (!stored) return null;
   try {
@@ -84,19 +84,18 @@ async function deriveKey(pin: string, salt: Uint8Array<ArrayBuffer>): Promise<Cr
 }
 
 /**
- * Encrypts username + appPassword with the given PIN and stores the result
+ * Encrypts token with the given PIN and stores the result
  * in localStorage. The PIN itself is never stored.
  */
 export async function encryptCredentials(
   pin: string,
-  username: string,
-  appPassword: string
+  token: string
 ): Promise<void> {
   const salt = crypto.getRandomValues(new Uint8Array(16)) as Uint8Array<ArrayBuffer>;
   const iv = crypto.getRandomValues(new Uint8Array(12)) as Uint8Array<ArrayBuffer>;
   const key = await deriveKey(pin, salt);
   const enc = new TextEncoder();
-  const plaintext = enc.encode(JSON.stringify({ username, appPassword })) as Uint8Array<ArrayBuffer>;
+  const plaintext = enc.encode(JSON.stringify({ token })) as Uint8Array<ArrayBuffer>;
   const ciphertext = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, plaintext);
   localStorage.setItem(
     PIN_KEY,
@@ -125,8 +124,8 @@ export async function decryptCredentials(pin: string): Promise<boolean> {
       key,
       hex2buf(ciphertext).buffer
     );
-    const { username, appPassword } = JSON.parse(dec.decode(plaintext));
-    setAuth(username, appPassword);
+    const { token } = JSON.parse(dec.decode(plaintext));
+    setAuth(token);
     return true;
   } catch {
     // Wrong PIN → AES-GCM authentication tag mismatch throws

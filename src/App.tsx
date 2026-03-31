@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { hasPinSetup, loadCredentials, getStoredCredentials, clearPin } from "@/lib/auth";
 import LoginPage from "@/pages/LoginPage";
-import RegisterPage from "@/pages/RegisterPage";
-import ForgotAppPasswordPage from "@/pages/ForgotAppPasswordPage";
 import PinSetupPage from "@/pages/PinSetupPage";
 import PinEntryPage from "@/pages/PinEntryPage";
 import HomePage from "@/pages/HomePage";
@@ -10,15 +8,12 @@ import HomePage from "@/pages/HomePage";
 type AuthState =
   | "loading"
   | "credentials"   // no credentials at all → show login form
-  | "register"      // register new user
-  | "forgot-password" // forgot app password
   | "pin-setup"     // credentials validated, no PIN yet → set PIN
   | "pin-entry"     // PIN exists → enter PIN to decrypt
   | "home";         // authenticated
 
 interface PendingCreds {
-  username: string;
-  appPassword: string;
+  token: string;
 }
 
 export default function App() {
@@ -41,8 +36,8 @@ export default function App() {
 
   // ── Handlers ──
 
-  function handleCredentialLogin(username: string, appPassword: string) {
-    setPendingCreds({ username, appPassword });
+  function handleCredentialLogin(token: string) {
+    setPendingCreds({ token });
     if (hasPinSetup()) {
       // User is logging in with credentials while a PIN is set.
       // This means they are resetting a forgotten PIN, or swapping users.
@@ -91,23 +86,11 @@ export default function App() {
       {authState === "credentials" && (
         <LoginPage 
           onLogin={handleCredentialLogin} 
-          onGoToRegister={() => setAuthState("register")}
-          onGoToForgot={() => setAuthState("forgot-password")}
         />
-      )}
-      {authState === "register" && (
-        <RegisterPage 
-          onBack={() => setAuthState("credentials")} 
-          onLogin={handleCredentialLogin}
-        />
-      )}
-      {authState === "forgot-password" && (
-        <ForgotAppPasswordPage onBack={() => setAuthState("credentials")} />
       )}
       {authState === "pin-setup" && pendingCreds && (
         <PinSetupPage
-          username={pendingCreds.username}
-          appPassword={pendingCreds.appPassword}
+          token={pendingCreds.token}
           onComplete={handlePinSetupComplete}
         />
       )}
