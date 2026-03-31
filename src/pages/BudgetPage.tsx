@@ -23,7 +23,7 @@ export default function BudgetPage({
   onShowProfile,
   isCurrentMonth = false,
 }: Props) {
-  const { budgetDetails, fetchBudgetDetails, invalidateBudgetDetails, invalidateBudgets, fetchBudgets } = useData();
+  const { budgetDetails, fetchBudgetDetails, invalidateBudgetDetails, invalidateBudgets, fetchBudgets, invalidateAccounts, fetchAccounts } = useData();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>(undefined);
@@ -49,7 +49,9 @@ export default function BudgetPage({
     try {
       await api.transactions.delete(budgetId, tid as any);
       invalidateBudgetDetails(budgetId);
+      invalidateAccounts();
       await fetchBudgetDetails(budgetId, true);
+      fetchAccounts(true).catch(() => {});
     } catch (error) {
       console.error("Failed to delete transaction:", error);
     }
@@ -65,8 +67,10 @@ export default function BudgetPage({
     setEditingTransaction(undefined);
     invalidateBudgetDetails(budgetId);
     invalidateBudgets();
+    invalidateAccounts();
     await fetchBudgetDetails(budgetId, true);
     fetchBudgets(true).catch(() => {});
+    fetchAccounts(true).catch(() => {});
   }
 
   function handleFormBack() {

@@ -87,7 +87,7 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
       notes: notes || undefined,
       tags: selectedTags.length > 0 ? selectedTags : undefined,
       account_id: accountId ? Number(accountId) : undefined,
-      to_account_id: type === "transfer" && toAccountId ? Number(toAccountId) : undefined,
+      to_account_id: toAccountId ? Number(toAccountId) : undefined,
     };
     try {
       if (isEdit && transaction) {
@@ -135,23 +135,21 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
               value={accountId}
               onChange={e => setAccountId(e.target.value ? Number(e.target.value) : "")}
             >
-              <option value="">{type === "transfer" ? "Select Source Account" : "Select Account"}</option>
+              <option value="">{type === "transfer" ? "Select Source Account" : "Select Primary Account"}</option>
               {allAccounts?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
             </select>
           </div>
 
-          {type === "transfer" && (
-            <div className="sketch-field">
-              <select
-                className="sketch-select"
-                value={toAccountId}
-                onChange={e => setToAccountId(e.target.value ? Number(e.target.value) : "")}
-              >
-                <option value="">Select Destination Account</option>
-                {allAccounts?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-              </select>
-            </div>
-          )}
+          <div className="sketch-field">
+            <select
+              className="sketch-select"
+              value={toAccountId}
+              onChange={e => setToAccountId(e.target.value ? Number(e.target.value) : "")}
+            >
+              <option value="">{type === "transfer" ? "Select Destination Account" : "Select Secondary Account (Optional)"}</option>
+              {allAccounts?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </select>
+          </div>
 
           <div className="sketch-field">
             <input

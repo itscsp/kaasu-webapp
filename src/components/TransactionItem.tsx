@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ArrowRight } from "lucide-react";
 import { Transaction, Tag } from "@/lib/api";
+import { useData } from "@/context/DataContext";
 
 interface Props {
   transaction: Transaction;
@@ -13,9 +14,13 @@ export default function TransactionItem({ transaction, onEdit, onDelete }: Props
   const [deleted, setDeleted] = useState(false);
 
 
-  const sign = transaction.type === "income" ? "+" : "-";
+  const sign = transaction.type === "transfer" ? "" : transaction.type === "income" ? "+" : "-";
   const dateObj = new Date(transaction.date);
   const day = dateObj.getDate();
+
+  const { accounts } = useData();
+  const fromAccount = accounts?.find(a => a.id === transaction.account_id);
+  const toAccount = accounts?.find(a => a.id === transaction.to_account_id);
 
   return (
     <div className="transaction-item">
@@ -36,8 +41,15 @@ export default function TransactionItem({ transaction, onEdit, onDelete }: Props
 
       {expanded && (
         <div className="transaction-detail">
+          {transaction.type === "transfer" && (fromAccount || toAccount) && (
+            <div className="flex items-center gap-2 text-xs text-gray-400 mb-2 bg-black/20 p-2 rounded-md">
+              <span className="truncate max-w-[40%] font-medium text-gray-300">{fromAccount?.name || "Unknown"}</span>
+              <ArrowRight size={12} className="flex-shrink-0" />
+              <span className="truncate max-w-[40%] font-medium text-gray-300">{toAccount?.name || "Unknown"}</span>
+            </div>
+          )}
           {transaction.notes && (
-            <p className="text-sm text-gray-400 mb-1">{transaction.notes}</p>
+            <p className="text-sm text-gray-400 mb-2">{transaction.notes}</p>
           )}
           {transaction.tag_objects && transaction.tag_objects.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-2">
