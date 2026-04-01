@@ -31,14 +31,21 @@
   --ring: 224 14% 20%;
   --card: 224 15% 12%;
   --card-foreground: 210 40% 98%;
-  --primary: 175 66% 42%;
+  --primary: 165 60% 50%;
   --primary-foreground: 210 40% 98%;
   --muted: 224 14% 14%;
   --muted-foreground: 215 20% 65%;
   --destructive: 0 72% 60%;
   --destructive-foreground: 0 0% 98%;
-  --app-font-sans: 'Roboto', sans-serif;
-  --radius: 0.5rem;
+  --app-font-sans: 'Inter', 'Roboto', sans-serif;
+  --radius: 12px;
+
+  /* Group Colors */
+  --color-loan: 0 85% 65%;
+  --color-bank: 210 90% 60%;
+  --color-investment: 45 95% 55%;
+  --color-cash: 165 75% 45%;
+  --color-saving: 280 70% 65%;
 }
 
 @layer base {
@@ -232,19 +239,24 @@
 
 /* ── Transaction items ── */
 .transaction-item {
-  border-radius: 8px;
-  margin-bottom: 8px;
+  border-radius: var(--radius);
+  margin-bottom: 12px;
   overflow: hidden;
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.transaction-item:active {
+  transform: scale(0.98);
 }
 
 .transaction-row {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
+  gap: 16px;
+  padding: 16px;
   background: none;
   border: none;
   cursor: pointer;
@@ -254,24 +266,71 @@
 }
 
 .transaction-date-badge {
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: hsl(var(--muted-foreground));
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
   flex-shrink: 0;
 }
 
-.transaction-amount {
-  font-size: 1rem;
-  font-weight: 500;
+.transaction-info {
+  display: flex;
+  flex-direction: column;
   flex: 1;
+  min-width: 0;
+}
+
+.transaction-notes {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: hsl(var(--muted-foreground));
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.transaction-amount {
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.transaction-amount.income {
+  color: hsl(150 70% 55%);
+}
+
+.transaction-amount.expense {
+  color: hsl(0 80% 65%);
+}
+
+.transaction-amount.transfer {
+  color: hsl(45 95% 55%);
+}
+
+.badge-transfer {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(252, 196, 25, 0.2);
+  color: #fcc419;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 8px;
 }
 
 .transaction-detail {
-  padding: 0px 12px 12px;
+  padding: 0px 16px 16px;
   background: hsl(var(--card));
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* ── Archive rows ── */
@@ -343,10 +402,132 @@
   resize: vertical;
 }
 
+/* ── Account Cards ── */
+.account-card {
+  position: relative;
+  border-radius: var(--radius);
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  margin-bottom: 12px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.account-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.account-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: hsl(var(--muted));
+}
+
+.account-card-loan::before { background-color: hsl(var(--color-loan)); box-shadow: 0 0 10px hsla(var(--color-loan), 0.3); }
+.account-card-bank::before { background-color: hsl(var(--color-bank)); }
+.account-card-investment::before { background-color: hsl(var(--color-investment)); }
+.account-card-cash::before { background-color: hsl(var(--color-cash)); }
+.account-card-saving::before { background-color: hsl(var(--color-saving)); }
+
+.account-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 8px;
+  flex: 1;
+}
+
+.account-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.account-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.group-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: hsl(var(--muted-foreground));
+}
+
+.group-badge-loan { color: hsl(var(--color-loan)); background: hsla(var(--color-loan), 0.1); }
+.group-badge-bank { color: hsl(var(--color-bank)); background: hsla(var(--color-bank), 0.1); }
+.group-badge-investment { color: hsl(var(--color-investment)); background: hsla(var(--color-investment), 0.1); }
+.group-badge-cash { color: hsl(var(--color-cash)); background: hsla(var(--color-cash), 0.1); }
+.group-badge-saving { color: hsl(var(--color-saving)); background: hsla(var(--color-saving), 0.1); }
+
+.txn-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #74c0fc;
+  border: 1px solid rgba(116, 192, 252, 0.2);
+}
+
+.account-desc {
+  font-size: 10px;
+  color: hsl(var(--muted-foreground));
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  line-clamp: 1;
+  overflow: hidden;
+  opacity: 0.7;
+}
+
+.account-amount {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: hsl(var(--primary));
+  text-align: right;
+  margin-left: 12px;
+}
+
+.account-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 16px;
+  color: hsl(var(--muted-foreground));
+}
+
+.action-btn {
+  padding: 4px;
+  cursor: pointer;
+  transition: color 0.1s;
+}
+
+.action-btn:hover {
+  color: hsl(var(--foreground));
+}
+
 /* ── Sketch box (generic bordered container) ── */
 .sketch-box {
   border: 1px solid hsl(var(--border));
-  border-radius: 8px;
+  border-radius: var(--radius);
   background: hsl(var(--card));
 }
 
