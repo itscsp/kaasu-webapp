@@ -125,15 +125,40 @@ export interface PlanBody {
 }
 
 export interface RegisterBody {
-  phone: string;
   name: string;
   email: string;
+  password: string;
+}
+
+export interface LoginBody {
+  email: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  success: boolean;
+  token: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
 }
 
 export const api = {
   auth: {
+    login: (data: LoginBody) =>
+      request<AuthResponse>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    register: (data: RegisterBody) =>
+      request<AuthResponse>("/auth/register", {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
     googleSignIn: (token: string) =>
-      request<{ success: boolean; user: { name: string; email: string } }>("/auth/google", {
+      request<AuthResponse>("/auth/google", {
         method: "POST",
         body: JSON.stringify({ token }),
       }),
