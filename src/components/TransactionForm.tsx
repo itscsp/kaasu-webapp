@@ -35,8 +35,8 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchTags().catch(() => {});
-    fetchAccounts().catch(() => {});
+    fetchTags().catch(() => { });
+    fetchAccounts().catch(() => { });
   }, [fetchTags, fetchAccounts]);
 
   function toggleTag(id: number) {
@@ -102,11 +102,10 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
                 key={t}
                 type="button"
                 onClick={() => setType(t)}
-                className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all ${
-                  type === t 
-                    ? "bg-[hsl(var(--primary))] text-white shadow-lg" 
+                className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all ${type === t
+                    ? "bg-[hsl(var(--primary))] text-white shadow-lg"
                     : "text-gray-500 hover:text-gray-300"
-                }`}
+                  }`}
               >
                 {t}
               </button>
@@ -115,17 +114,17 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
 
           {/* Amount Input */}
           <div className="relative">
-             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-500">₹</div>
-             <input
-                className="w-full bg-white/5 border border-white/10 rounded-2xl py-6 pl-10 pr-4 text-3xl font-bold text-[hsl(var(--primary))] outline-none focus:border-[hsl(var(--primary))]/30 transition-all placeholder:text-gray-800"
-                type="number"
-                placeholder="0.00"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                required
-                min="0"
-                step="0.01"
-              />
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-500">₹</div>
+            <input
+              className="w-full bg-white/5 border border-white/10 rounded-2xl py-6 pl-10 pr-4 text-3xl font-bold text-[hsl(var(--primary))] outline-none focus:border-[hsl(var(--primary))]/30 transition-all placeholder:text-gray-800"
+              type="number"
+              placeholder="0.00"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              required
+              min="0"
+              step="0.01"
+            />
           </div>
 
           <div className="grid grid-cols-1 gap-4">
@@ -155,39 +154,39 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
           </div>
 
           {/* Accounts Section */}
-          {(type === "expenses" || type === "transfer") && (
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-gray-600 uppercase tracking-widest ml-1">
-                {type === "transfer" ? "From Account" : "Paid From"}
-              </label>
-              <select
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-gray-200 outline-none focus:border-[hsl(var(--primary))]/30 transition-all appearance-none"
-                value={fromAccountId}
-                onChange={e => setFromAccountId(e.target.value ? Number(e.target.value) : "")}
-                required={type === "transfer"}
-              >
-                <option value="" className="bg-[#1c1f26]">Select account...</option>
-                {allAccounts?.map(a => <option key={a.id} value={a.id} className="bg-[#1c1f26]">{a.name}</option>)}
-              </select>
-            </div>
-          )}
 
-          {(type === "income" || type === "transfer") && (
-            <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-gray-600 uppercase tracking-widest ml-1">
-                {type === "transfer" ? "To Account" : "Deposited To"}
-              </label>
-              <select
-                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-gray-200 outline-none focus:border-[hsl(var(--primary))]/30 transition-all appearance-none"
-                value={toAccountId}
-                onChange={e => setToAccountId(e.target.value ? Number(e.target.value) : "")}
-                required={type === "transfer"}
-              >
-                <option value="" className="bg-[#1c1f26]">Select account...</option>
-                {allAccounts?.map(a => <option key={a.id} value={a.id} className="bg-[#1c1f26]">{a.name}</option>)}
-              </select>
-            </div>
-          )}
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-gray-600 uppercase tracking-widest ml-1">
+              {type === "transfer" ? "From Account" : "Paid From"}
+            </label>
+            <select
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-gray-200 outline-none focus:border-[hsl(var(--primary))]/30 transition-all appearance-none"
+              value={fromAccountId}
+              onChange={e => setFromAccountId(e.target.value ? Number(e.target.value) : "")}
+              required={type === "transfer"}
+            >
+              <option value="" className="bg-[#1c1f26]">Select account...</option>
+              {allAccounts?.map(a => <option key={a.id} value={a.id} className="bg-[#1c1f26]">{a.name}</option>)}
+            </select>
+          </div>
+
+
+
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-gray-600 uppercase tracking-widest ml-1">
+              {type === "transfer" ? "To Account" : "Deposited To"}
+            </label>
+            <select
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-gray-200 outline-none focus:border-[hsl(var(--primary))]/30 transition-all appearance-none"
+              value={toAccountId}
+              onChange={e => setToAccountId(e.target.value ? Number(e.target.value) : "")}
+              required={type === "transfer"}
+            >
+              <option value="" className="bg-[#1c1f26]">Select account...</option>
+              {allAccounts?.map(a => <option key={a.id} value={a.id} className="bg-[#1c1f26]">{a.name}</option>)}
+            </select>
+          </div>
+
 
           {/* Tags */}
           <div className="space-y-3 pt-2">
@@ -200,11 +199,10 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
                     key={tag.id}
                     type="button"
                     onClick={() => toggleTag(tag.id)}
-                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all ${
-                      selected 
-                        ? "bg-[hsl(var(--primary))]/10 border-[hsl(var(--primary))]/40 text-[hsl(var(--primary))]" 
+                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all ${selected
+                        ? "bg-[hsl(var(--primary))]/10 border-[hsl(var(--primary))]/40 text-[hsl(var(--primary))]"
                         : "bg-white/5 border-white/5 text-gray-500 hover:text-gray-300"
-                    }`}
+                      }`}
                   >
                     {tag.name}
                   </button>
