@@ -112,20 +112,25 @@ export default function BudgetPage({
       </div>
 
       {summary && (
-        <div className="summary-bar">
-          <div className="summary-item">
-            <span className="summary-label">Income</span>
-            <span className="summary-value income">+{(Number(summary.total_income) || 0).toLocaleString()}</span>
+        <div className="mx-4 my-2 p-4 bg-white/5 border border-white/10 rounded-2xl flex justify-between items-center shadow-lg backdrop-blur-md">
+          <div className="flex flex-col items-center">
+            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Income</span>
+            <span className="text-base font-bold text-[hsl(150_70%_55%)] leading-none">
+              ₹{(Number(summary.total_income) || 0).toLocaleString()}
+            </span>
           </div>
-          <div className="summary-item">
-            <span className="summary-label">Expenses</span>
-            <span className="summary-value expenses">-{(Number(summary.total_expenses) || 0).toLocaleString()}</span>
+          <div className="w-[1px] h-8 bg-white/10"></div>
+          <div className="flex flex-col items-center">
+            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Expenses</span>
+            <span className="text-base font-bold text-[hsl(0_80%_65%)] leading-none">
+              ₹{(Number(summary.total_expenses) || 0).toLocaleString()}
+            </span>
           </div>
-          <div className="summary-item">
-            <span className="summary-label">Balance</span>
-            <span className={`summary-value ${(Number(summary.net_balance) || 0) >= 0 ? "income" : "expenses"}`}>
-              {(Number(summary.net_balance) || 0) >= 0 ? "+" : ""}
-              {(Number(summary.net_balance) || 0).toLocaleString()}
+          <div className="w-[1px] h-8 bg-white/10"></div>
+          <div className="flex flex-col items-center">
+            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Balance</span>
+            <span className={`text-base font-bold leading-none ${(Number(summary.net_balance) || 0) >= 0 ? "text-[hsl(150_70%_55%)]" : "text-[hsl(0_80%_65%)]"}`}>
+              ₹{(Number(summary.net_balance) || 0).toLocaleString()}
             </span>
           </div>
         </div>
@@ -176,22 +181,30 @@ export default function BudgetPage({
       </div>
 
       {isCurrentMonth && (
-        <div className="bottom-tab-bar">
-          <button className="bottom-tab active flex flex-col items-center gap-0.5">
-            <Home size={16} />
-            <span className="text-[10px]">{budget?.title?.split(" ")[0]}</span>
+        <div className="bottom-tab-bar bg-[#0f1115]/80 backdrop-blur-xl border-t border-white/5 px-2 py-3">
+          <button className="bottom-tab active flex flex-col items-center gap-1">
+            <div className={`p-1.5 rounded-xl ${activeTab === 'transactions' ? 'bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))]' : 'text-gray-500'}`}>
+              <Home size={18} strokeWidth={activeTab === 'transactions' ? 2.5 : 2} />
+            </div>
+            <span className="text-[9px] font-bold uppercase tracking-wider">{budget?.title?.split(" ")[0]}</span>
           </button>
-          <button className="bottom-tab flex flex-col items-center gap-0.5" onClick={onShowSummary}>
-            <BarChart2 size={16} />
-            <span className="text-[10px]">Stats</span>
+          <button className="bottom-tab flex flex-col items-center gap-1 group" onClick={onShowSummary}>
+            <div className="p-1.5 rounded-xl group-hover:bg-white/5 text-gray-500 transition-all">
+              <BarChart2 size={18} strokeWidth={2} />
+            </div>
+            <span className="text-[9px] font-bold uppercase tracking-wider">Stats</span>
           </button>
-          <button className="bottom-tab flex flex-col items-center gap-0.5" onClick={onShowAccounts}>
-            <Landmark size={16} />
-            <span className="text-[10px]">Accounts</span>
+          <button className="bottom-tab flex flex-col items-center gap-1 group" onClick={onShowAccounts}>
+            <div className="p-1.5 rounded-xl group-hover:bg-white/5 text-gray-500 transition-all">
+              <Landmark size={18} strokeWidth={2} />
+            </div>
+            <span className="text-[9px] font-bold uppercase tracking-wider">Accounts</span>
           </button>
-          <button className="bottom-tab flex flex-col items-center gap-0.5" onClick={onShowProfile}>
-            <User size={16} />
-            <span className="text-[10px]">Profile</span>
+          <button className="bottom-tab flex flex-col items-center gap-1 group" onClick={onShowProfile}>
+            <div className="p-1.5 rounded-xl group-hover:bg-white/5 text-gray-500 transition-all">
+              <User size={18} strokeWidth={2} />
+            </div>
+            <span className="text-[9px] font-bold uppercase tracking-wider">Profile</span>
           </button>
         </div>
       )}

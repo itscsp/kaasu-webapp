@@ -18,49 +18,41 @@ export default function ProfilePage({ onBack, onShowTags, onShowSummary, onShowA
       </div>
 
       <div className="screen-body py-6">
-        <div className="flex flex-col gap-4">
-          <button 
-            onClick={onShowSummary}
-            className="flex items-center justify-between p-4 sketch-box hover:opacity-80 transition-opacity"
-          >
-            <div className="flex items-center gap-3">
-              <BarChart2 className="text-[hsl(var(--muted-foreground))]" size={20} />
-              <span className="font-medium text-[hsl(var(--foreground))]">View Summary</span>
-            </div>
-            <ChevronRight className="text-[hsl(var(--muted-foreground))]" size={20} />
-          </button>
-
-          <button 
-            onClick={onShowTags}
-            className="flex items-center justify-between p-4 sketch-box hover:opacity-80 transition-opacity"
-          >
-            <div className="flex items-center gap-3">
-              <TagIcon className="text-[hsl(var(--muted-foreground))]" size={20} />
-              <span className="font-medium text-[hsl(var(--foreground))]">Manage Tags</span>
-            </div>
-            <ChevronRight className="text-[hsl(var(--muted-foreground))]" size={20} />
-          </button>
-
-          <button 
-            onClick={onShowArchive}
-            className="flex items-center justify-between p-4 sketch-box hover:opacity-80 transition-opacity"
-          >
-            <div className="flex items-center gap-3">
-              <Archive className="text-[hsl(var(--muted-foreground))]" size={20} />
-              <span className="font-medium text-[hsl(var(--foreground))]">View Archive</span>
-            </div>
-            <ChevronRight className="text-[hsl(var(--muted-foreground))]" size={20} />
-          </button>
+        <div className="flex flex-col gap-3">
+          {[
+            { icon: BarChart2, label: "View Summary", action: onShowSummary, color: "text-blue-400" },
+            { icon: TagIcon, label: "Manage Tags", action: onShowTags, color: "text-purple-400" },
+            { icon: Archive, label: "View Archive", action: onShowArchive, color: "text-amber-400" },
+          ].map((item, i) => (
+            <button 
+              key={i}
+              onClick={item.action}
+              className="flex items-center justify-between p-5 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-white/20 transition-all active:scale-[0.98] group"
+            >
+              <div className="flex items-center gap-4">
+                <div className={`p-2.5 rounded-xl bg-white/5 border border-white/5 ${item.color} group-hover:scale-110 transition-transform`}>
+                  <item.icon size={20} />
+                </div>
+                <span className="font-semibold text-gray-200 group-hover:text-white transition-colors">{item.label}</span>
+              </div>
+              <ChevronRight className="text-gray-600 group-hover:text-gray-300 transition-colors" size={20} />
+            </button>
+          ))}
           
-          <button 
-            onClick={onLogout}
-            className="flex items-center justify-between p-4 sketch-box hover:opacity-80 transition-opacity border-[hsl(var(--destructive))] bg-transparent"
-          >
-            <div className="flex items-center gap-3 text-[hsl(var(--destructive))]">
-              <LogOut size={20} />
-              <span className="font-medium">Sign Out</span>
-            </div>
-          </button>
+          <div className="mt-4 pt-4 border-t border-white/5">
+            <button 
+              onClick={onLogout}
+              className="w-full flex items-center justify-between p-5 bg-[hsl(0_80%_65%)]/5 border border-[hsl(0_80%_65%)]/20 rounded-2xl hover:bg-[hsl(0_80%_65%)]/10 transition-all active:scale-[0.98] group"
+            >
+              <div className="flex items-center gap-4 text-[hsl(0_80%_65%)]">
+                <div className="p-2.5 rounded-xl bg-[hsl(0_80%_65%)]/10 border border-[hsl(0_80%_65%)]/10 group-hover:scale-110 transition-transform">
+                  <LogOut size={20} />
+                </div>
+                <span className="font-bold uppercase tracking-wider text-xs">Sign Out</span>
+              </div>
+              <ChevronRight className="text-[hsl(0_80%_65%)]/40" size={20} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

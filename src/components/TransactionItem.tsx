@@ -29,38 +29,41 @@ export default function TransactionItem({ transaction, onEdit, onDelete }: Props
         onClick={() => setExpanded((v) => !v)}
       >
         <div className="transaction-date-badge">{day}</div>
-        <div className="transaction-amount">
-          {sign} {Math.abs(Number(transaction.amount) || 0).toLocaleString()}
+        <div className="transaction-info">
+          <div className="transaction-notes">
+            {transaction.notes || (transaction.type === "transfer" ? "Transfer" : "No description")}
+          </div>
+          <div className={`transaction-amount ${transaction.type}`}>
+            {sign} ₹{Math.abs(Number(transaction.amount) || 0).toLocaleString()}
+            {transaction.type === "transfer" && <span className="badge-transfer">Transfer</span>}
+          </div>
         </div>
         {expanded ? (
-          <ChevronUp size={16} className="ml-auto text-gray-500 flex-shrink-0" />
+          <ChevronUp size={16} className="text-gray-500 flex-shrink-0" />
         ) : (
-          <ChevronDown size={16} className="ml-auto text-gray-500 flex-shrink-0" />
+          <ChevronDown size={16} className="text-gray-500 flex-shrink-0" />
         )}
       </button>
 
       {expanded && (
         <div className="transaction-detail">
           {(fromAccount || toAccount) && (
-            <div className="flex items-center gap-2 text-xs text-[hsl(var(--muted-foreground))] mb-2 bg-black/20 p-2 rounded-md">
+            <div className="flex items-center gap-2 text-[10px] text-[hsl(var(--muted-foreground))] mb-3 bg-white/5 p-2 rounded-md border border-white/5">
               {fromAccount && (
                 <span className="truncate max-w-[45%] font-medium text-[hsl(var(--foreground))]">{fromAccount.name}</span>
               )}
               {fromAccount && toAccount && (
-                <ArrowRight size={12} className="flex-shrink-0 opacity-50" />
+                <ArrowRight size={10} className="flex-shrink-0 opacity-50" />
               )}
               {toAccount && (
                 <span className="truncate max-w-[45%] font-medium text-[hsl(var(--foreground))]">{toAccount.name}</span>
               )}
             </div>
           )}
-          {transaction.notes && (
-            <p className="text-sm text-gray-400 mb-2">{transaction.notes}</p>
-          )}
           {transaction.tag_objects && transaction.tag_objects.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-2">
+            <div className="flex flex-wrap gap-1 mb-3">
               {transaction.tag_objects.map((tag: Tag) => (
-                <span key={tag.id} className="tag-badge">
+                <span key={tag.id} className="tag-badge text-[10px] py-0.5 px-2">
                   {tag.name}
                 </span>
               ))}
@@ -68,19 +71,19 @@ export default function TransactionItem({ transaction, onEdit, onDelete }: Props
           )}
           <div className="flex gap-2 mt-2">
             <button
-              className="sketch-btn flex-1"
+              className="sketch-btn flex-1 py-1.5 text-xs"
               onClick={() => onEdit(transaction)}
             >
               Update
             </button>
             {deleted ?
               (<button
-                className="sketch-btn sketch-btn-danger flex-1"
+                className="sketch-btn sketch-btn-danger flex-1 py-1.5 text-xs"
                 onClick={() => onDelete(transaction.id)}
               >Are you sure?
               </button>) :
               (<button
-                className="sketch-btn sketch-btn-danger flex-1"
+                className="sketch-btn sketch-btn-danger flex-1 py-1.5 text-xs"
                 onClick={() => setDeleted(true)}
               >
                 Delete

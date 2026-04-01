@@ -62,42 +62,40 @@ export default function TagsPage({ onBack }: Props) {
         <span className="w-12" />
       </div>
 
-      <div className="screen-body">
-        <form onSubmit={handleCreate} className="flex gap-2 mb-4">
+      <div className="screen-body py-2">
+        <form onSubmit={handleCreate} className="flex gap-2 mb-6 bg-white/5 p-2 rounded-2xl border border-white/10 shadow-lg group focus-within:border-[hsl(var(--primary))]/30 transition-all">
           <input
-            className="sketch-input flex-1"
-            placeholder="New tag name"
+            className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-gray-600 px-3 py-2 text-gray-200"
+            placeholder="New tag name..."
             value={newTag}
             onChange={(e) => setNewTag(e.target.value)}
           />
-          <button type="submit" className="sketch-btn flex items-center gap-1 px-3">
-            <Plus size={14} /> Add
+          <button type="submit" className="bg-[hsl(var(--primary))] text-white p-2.5 rounded-xl shadow-lg shadow-[hsl(var(--primary))]/20 active:scale-95 transition-all flex items-center justify-center">
+            <Plus size={18} strokeWidth={3} />
           </button>
         </form>
 
-        {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
-        {loading && <p className="text-sm text-gray-500">Loading…</p>}
+        {error && <p className="text-[10px] font-bold text-[hsl(0_80%_65%)] uppercase tracking-[0.1em] mb-4 text-center px-4">{error}</p>}
+        {loading && <p className="text-center text-[10px] text-gray-600 py-12 tracking-[0.2em] uppercase font-bold">Loading tags…</p>}
 
-        {!loading && (tags || []).map((tag) => (
-            <div key={tag.id} className="flex items-center justify-between sketch-box px-3 py-2 mb-2">
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-medium">
+        <div className="grid grid-cols-2 gap-3 pb-8">
+          {!loading && (tags || []).map((tag) => (
+              <div key={tag.id} className="flex items-center justify-between bg-white/5 border border-white/5 rounded-xl px-3 py-2 hover:bg-white/10 hover:border-white/10 transition-all group relative overflow-hidden">
+                <span className="text-xs font-semibold text-gray-400 group-hover:text-gray-100 transition-colors truncate pr-2">
                   {tag.name}
                 </span>
-              </div>
-              <div className="flex items-center gap-2">
-                {deletingId === tag.id && <span className="text-xs text-red-400">Sure?</span>}
                 <button
                   onClick={() => (deletingId === tag.id ? handleDelete(tag.id) : setDeletingId(tag.id))}
-                  className="text-gray-400 hover:text-red-500"
+                  className={`flex-shrink-0 p-1.5 rounded-lg transition-all ${deletingId === tag.id ? 'bg-[hsl(0_80%_65%)] text-white shadow-lg shadow-[hsl(0_80%_65%)]/20' : 'text-gray-700 hover:text-[hsl(0_80%_65%)] hover:bg-[hsl(0_80%_65%)]/10'}`}
                 >
-                  <X size={14} />
+                  <X size={12} strokeWidth={2.5} />
                 </button>
               </div>
-            </div>
-          ))}
+            ))}
+        </div>
+        
         {!loading && (tags || []).length === 0 && (
-          <p className="text-sm text-gray-400 text-center">No tags yet</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-center py-20 text-gray-700">No tags found</p>
         )}
       </div>
     </div>

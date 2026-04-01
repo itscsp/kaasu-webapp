@@ -340,6 +340,15 @@ export default function AccountsPage({ onBack }: Props) {
     return acc;
   }, {} as Record<string, Account[]>);
 
+  const groupDisplayMap: Record<string, string> = {
+    "Accounts": "Bank / Accounts",
+    "Loan": "Loan",
+    "Investment": "Investment",
+    "Cash": "Cash",
+    "Saving": "Saving",
+    "Insurance": "Insurance"
+  };
+
   return (
     <div className="phone-frame">
       <div className="screen-header">
@@ -360,48 +369,65 @@ export default function AccountsPage({ onBack }: Props) {
 
         {!loading && Object.keys(groupedAccounts).map(grp => (
           <div key={grp} className="mb-6">
-            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{grp}</h3>
+            <h3 className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3 ml-1">
+              {groupDisplayMap[grp] || grp}
+            </h3>
             <div className="flex flex-col gap-2">
-              {groupedAccounts[grp].map(acc => (
-                <div 
-                  key={acc.id} 
-                  className="sketch-box p-3 flex justify-between items-center group cursor-pointer hover:bg-muted/30 transition-colors"
-                  onClick={() => setViewingAccount(acc)}
-                >
-                  <div className="flex flex-col">
-                    <span className="font-medium flex items-center gap-2">
-                      {acc.name}
-                      {acc.is_connected && (
-                        <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded flex items-center gap-1" title={`Linked to ${acc.transaction_count} transactions`}>
-                          <LinkIcon size={10} /> {acc.transaction_count}
+              {groupedAccounts[grp].map(acc => {
+                const groupClass = acc.group.toLowerCase().replace(' ', '-');
+                return (
+                  <div 
+                    key={acc.id} 
+                    className={`account-card account-card-${groupClass}`}
+                    onClick={() => setViewingAccount(acc)}
+                  >
+                    <div className="account-info">
+                      <span className="account-name">{acc.name}</span>
+                      <div className="account-meta">
+                        <span className={`group-badge group-badge-${groupClass}`}>
+                          {acc.group}
                         </span>
-                      )}
-                    </span>
-                    <span className="text-xs text-gray-400">{acc.description || "No description"}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className={`font-semibold ${(Number(acc.amount) || 0) >= 0 ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]"}`}>
-                      ₹{(Number(acc.amount) || 0).toLocaleString()}
-                    </span>
-                    <div className="flex gap-2 text-gray-400 ml-2">
-                      <button 
-                        onClick={(e) => { e.stopPropagation(); handleEdit(acc); }} 
-                        className="hover:text-white"
-                      >
-                        <Edit2 size={14}/>
-                      </button>
-                      {!acc.is_connected && (
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); handleDelete(acc.id); }} 
-                          className="hover:text-red-500"
-                        >
-                          <Trash2 size={14}/>
-                        </button>
-                      )}
+                        {acc.is_connected && (
+                          <span className="txn-chip">
+                            <LinkIcon size={10} /> {acc.transaction_count} txn
+                          </span>
+                        )}
+                        <span className="account-desc">{acc.description}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col items-end">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="account-amount">
+                          ₹{(Number(acc.amount) || 0).toLocaleString()}
+                        </span>
+                        <div className="account-actions">
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); handleEdit(acc); }} 
+                            className="action-btn"
+                          >
+                            <Edit2 size={16}/>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {acc.is_connected ? (
+                          <div className="text-gray-600 opacity-40">
+                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                          </div>
+                        ) : (
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); handleDelete(acc.id); }} 
+                            className="text-gray-600 hover:text-red-500 opacity-40 hover:opacity-100 transition-all"
+                          >
+                            <Trash2 size={14}/>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         ))}
