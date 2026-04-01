@@ -47,7 +47,7 @@ export default function HomePage({ onLogout }: Props) {
         const sorted = [...budgets].sort((a, b) =>
           new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime()
         );
-        
+
         const currentMonthBudget = sorted.find(b => b.title === currentTitle);
         setCurrentBudget(currentMonthBudget || sorted[0]);
       }
@@ -90,7 +90,7 @@ export default function HomePage({ onLogout }: Props) {
   if (view.type === "tags") {
     return (
       <TagsPage
-        onBack={() => setView({ type: "profile" })}
+        onBack={() => setView({ type: "current" })}
       />
     );
   }
@@ -107,7 +107,7 @@ export default function HomePage({ onLogout }: Props) {
     return (
       <SummaryPage
         budgetId={currentBudget?.id}
-        onBack={() => setView({ type: "profile" })}
+        onBack={() => setView({ type: "current" })}
       />
     );
   }
@@ -128,7 +128,7 @@ export default function HomePage({ onLogout }: Props) {
     return (
       <BudgetPage
         budgetId={view.id}
-        onBack={() => setView({ type: "archive" })}
+        onBack={() => setView({ type: "current" })}
         onShowSummary={() => setView({ type: "summary" })}
         onShowAccounts={() => setView({ type: "accounts" })}
         onShowProfile={() => setView({ type: "profile" })}
