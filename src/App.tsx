@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { hasPinSetup, loadCredentials, getStoredCredentials, clearPin, clearCredentials } from "@/lib/auth";
 import { onSessionExpired } from "@/lib/api";
 import LoginPage from "@/pages/LoginPage";
+import RegisterPage from "@/pages/RegisterPage";
 import PinSetupPage from "@/pages/PinSetupPage";
 import PinEntryPage from "@/pages/PinEntryPage";
 import HomePage from "@/pages/HomePage";
@@ -19,6 +20,7 @@ interface PendingCreds {
 
 export default function App() {
   const [authState, setAuthState] = useState<AuthState>("loading");
+  const [isRegistering, setIsRegistering] = useState(false);
   const [pendingCreds, setPendingCreds] = useState<PendingCreds | null>(null);
 
   useEffect(() => {
@@ -92,9 +94,17 @@ export default function App() {
   return (
     <div className="app-shell">
       {authState === "credentials" && (
-        <LoginPage 
-          onLogin={handleCredentialLogin} 
-        />
+        isRegistering ? (
+          <RegisterPage 
+            onBack={() => setIsRegistering(false)}
+            onLoginSuccess={handleCredentialLogin}
+          />
+        ) : (
+          <LoginPage 
+            onLogin={handleCredentialLogin} 
+            onNavigateToRegister={() => setIsRegistering(true)}
+          />
+        )
       )}
       {authState === "pin-setup" && pendingCreds && (
         <PinSetupPage
