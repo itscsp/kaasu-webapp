@@ -16,7 +16,7 @@ export default function AccountsPage({ onBack }: Props) {
   // form state
   const [name, setName] = useState("");
   const [group, setGroup] = useState<"Cash"|"Accounts"|"Investment"|"Loan"|"Insurance"|"Saving">("Accounts");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(""); // This is Starting Balance in the form
   const [description, setDescription] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
 
@@ -60,7 +60,7 @@ export default function AccountsPage({ onBack }: Props) {
   function handleEdit(acc: Account) {
     setName(acc.name);
     setGroup(acc.group);
-    setAmount(String(acc.amount ?? acc.balance ?? 0));
+    setAmount(String(acc.starting_balance ?? acc.amount ?? 0));
     setDescription(acc.description || "");
     setEditingId(acc.id);
     setShowForm(true);
@@ -86,7 +86,7 @@ export default function AccountsPage({ onBack }: Props) {
         await api.accounts.update(editingId, {
           name: name.trim(),
           group,
-          amount: Number(amount),
+          amount: Number(amount), // Note: The backend currently maps 'amount' to '_bt_account_amount'
           description: description.trim() || undefined,
         });
       } else {
@@ -106,32 +106,12 @@ export default function AccountsPage({ onBack }: Props) {
   }
 
   if (viewingAccount) {
-    const currentBalance = Number(viewingAccount.amount ?? viewingAccount.balance) || 0;
-    let totalRemoved = 0;
+    const currentBalance = Number(viewingAccount.amount) || 0;
+    const startingBalance = Number(viewingAccount.starting_balance) || 0;
     
-    if (accountTransactions) {
-      accountTransactions.forEach(tx => {
-        const isDebit = tx.debit_account_id === viewingAccount.id || 
-                       (tx.type === 'income' && tx.account_id === viewingAccount.id) || 
-                       ((tx.type === 'transfer' || tx.type === 'expenses') && tx.to_account_id === viewingAccount.id);
-        const isCredit = tx.credit_account_id === viewingAccount.id || 
-                        (tx.type === 'expenses' && tx.account_id === viewingAccount.id) || 
-                        (tx.type === 'transfer' && tx.account_id === viewingAccount.id) ||
-                        (tx.type === 'income' && tx.to_account_id === viewingAccount.id);
-        
-        let multiplier = 0;
-        const group = viewingAccount.group;
-        
-        if (isDebit) {
-          multiplier = ['Loan', 'Insurance'].includes(group) ? -1 : 1;
-        } else if (isCredit) {
-          multiplier = ['Loan', 'Insurance'].includes(group) ? 1 : -1;
-        }
-        
-        const impactAmount = Number(tx.amount) * multiplier;
-        if (impactAmount < 0) totalRemoved += Math.abs(impactAmount);
-      });
-    }
+    // Group analysis
+    const isLiability = ['Loan', 'Insurance'].includes(viewingAccount.group);
+    const isInvestment = viewingAccount.group === 'Investment';
 
     return (
       <div className="phone-frame">
@@ -174,41 +154,67 @@ export default function AccountsPage({ onBack }: Props) {
                   <span className="font-medium">{viewingAccount.group}</span>
                 </div>
                 
-                {['Loan', 'Insurance'].includes(viewingAccount.group) ? (
+                {isLiability ? (
                   <>
                     <div className="flex justify-between border-b border-border pb-2">
-                      <span className="text-gray-400 text-sm">Total loan taken</span>
+                      <span className="text-gray-400 text-sm">Starting Balance (Debt)</span>
                       <span className="font-semibold text-[hsl(var(--destructive))]">
-                        ₹{(currentBalance + totalRemoved).toLocaleString()}
+                        ₹{startingBalance.toLocaleString()}
                       </span>
                     </div>
+                    {currentBalance < startingBalance && (
+                      <div className="flex justify-between border-b border-border pb-2">
+                        <span className="text-gray-400 text-sm">Total Paid</span>
+                        <span className="font-semibold text-[hsl(var(--primary))]">
+                          ₹{(startingBalance - currentBalance).toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                    {currentBalance > startingBalance && (
+                      <div className="flex justify-between border-b border-border pb-2">
+                        <span className="text-gray-400 text-sm">Additional Borrowing</span>
+                        <span className="font-semibold text-[hsl(var(--destructive))]">
+                          ₹{(currentBalance - startingBalance).toLocaleString()}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex justify-between border-b border-border pb-2">
-                      <span className="text-gray-400 text-sm">Total amount paid till now</span>
-                      <span className="font-semibold text-[hsl(var(--primary))]">
-                        ₹{totalRemoved.toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <span className="text-gray-400 text-sm">Total outstanding</span>
+                      <span className="text-gray-400 text-sm">Current Outstanding</span>
                       <span className="font-semibold text-[hsl(var(--destructive))]">
                         ₹{currentBalance.toLocaleString()}
                       </span>
                     </div>
                   </>
-                ) : viewingAccount.group === 'Investment' ? (
-                  <div className="flex justify-between border-b border-border pb-2">
-                    <span className="text-gray-400 text-sm">Total investment</span>
-                    <span className="font-semibold text-[hsl(var(--primary))]">
-                      ₹{currentBalance.toLocaleString()}
-                    </span>
-                  </div>
+                ) : isInvestment ? (
+                  <>
+                    <div className="flex justify-between border-b border-border pb-2">
+                      <span className="text-gray-400 text-sm">Starting Investment</span>
+                      <span className="font-semibold text-[hsl(var(--primary))]">
+                        ₹{startingBalance.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-b border-border pb-2">
+                      <span className="text-gray-400 text-sm">Current Value</span>
+                      <span className="font-semibold text-[hsl(var(--primary))]">
+                        ₹{currentBalance.toLocaleString()}
+                      </span>
+                    </div>
+                  </>
                 ) : (
-                  <div className="flex justify-between border-b border-border pb-2">
-                    <span className="text-gray-400 text-sm">Total amount in bank</span>
-                    <span className={`font-semibold ${currentBalance >= 0 ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]"}`}>
-                      ₹{currentBalance.toLocaleString()}
-                    </span>
-                  </div>
+                  <>
+                    <div className="flex justify-between border-b border-border pb-2">
+                      <span className="text-gray-400 text-sm">Starting Balance</span>
+                      <span className="font-semibold">
+                        ₹{startingBalance.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-b border-border pb-2">
+                      <span className="text-gray-400 text-sm">Current Balance</span>
+                      <span className={`font-semibold ${currentBalance >= 0 ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]"}`}>
+                        ₹{currentBalance.toLocaleString()}
+                      </span>
+                    </div>
+                  </>
                 )}
                 
                 <div className="flex flex-col gap-1">
@@ -236,28 +242,19 @@ export default function AccountsPage({ onBack }: Props) {
                 <p className="text-center text-sm text-gray-500 py-4">No linked transactions.</p>
               )}
               {!txLoading && accountTransactions && accountTransactions.map(tx => {
-                const isDebit = tx.debit_account_id === viewingAccount.id || 
-                               (tx.type === 'income' && tx.account_id === viewingAccount.id) || 
-                               ((tx.type === 'transfer' || tx.type === 'expenses') && tx.to_account_id === viewingAccount.id);
-                const isCredit = tx.credit_account_id === viewingAccount.id || 
-                                (tx.type === 'expenses' && tx.account_id === viewingAccount.id) || 
-                                (tx.type === 'transfer' && tx.account_id === viewingAccount.id) ||
-                                (tx.type === 'income' && tx.to_account_id === viewingAccount.id);
+                // New logic: from = minus, to = plus (adjusted by group in backend, but here we just show the impact)
+                const isFrom = tx.from_account_id === viewingAccount.id;
+                const isTo = tx.to_account_id === viewingAccount.id;
                 
                 let multiplier = 0;
-                const group = viewingAccount.group;
-                
-                if (isDebit) {
-                  multiplier = ['Loan', 'Insurance'].includes(group) ? -1 : 1;
-                } else if (isCredit) {
-                  multiplier = ['Loan', 'Insurance'].includes(group) ? 1 : -1;
-                }
+                if (isTo) multiplier = isLiability ? -1 : 1;
+                if (isFrom) multiplier = isLiability ? 1 : -1;
                 
                 const impactAmount = Number(tx.amount) * multiplier;
                 const sign = impactAmount > 0 ? '+' : impactAmount < 0 ? '-' : '';
                 const colorClass = impactAmount > 0 ? "text-[hsl(var(--primary))]" : impactAmount < 0 ? "text-[hsl(var(--destructive))]" : "text-[hsl(var(--muted-foreground))]";
                 
-                const otherAccountId = tx.account_id === viewingAccount.id ? tx.to_account_id : tx.account_id;
+                const otherAccountId = isFrom ? tx.to_account_id : tx.from_account_id;
                 const otherAccount = otherAccountId ? accounts?.find(a => a.id === otherAccountId) : null;
 
                 return (
@@ -270,7 +267,7 @@ export default function AccountsPage({ onBack }: Props) {
                       </span>
                       {otherAccount && (
                         <span className="text-[10px] text-[hsl(var(--muted-foreground))] mt-0.5 truncate">
-                          {isCredit ? "Towards |" : "From |"} {otherAccount.name}
+                          {isFrom ? "To |" : "From |"} {otherAccount.name}
                         </span>
                       )}
                     </div>
@@ -320,7 +317,7 @@ export default function AccountsPage({ onBack }: Props) {
               </select>
             </div>
             <div className="sketch-field">
-              <label className="field-label">Amount</label>
+              <label className="field-label">Starting Balance</label>
               <input className="sketch-input" type="number" step="0.01" required value={amount} onChange={e => setAmount(e.target.value)} />
             </div>
             <div className="sketch-field">
@@ -383,8 +380,8 @@ export default function AccountsPage({ onBack }: Props) {
                     <span className="text-xs text-gray-400">{acc.description || "No description"}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`font-semibold ${(Number(acc.amount ?? acc.balance) || 0) >= 0 ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]"}`}>
-                      ₹{(Number(acc.amount ?? acc.balance) || 0).toLocaleString()}
+                    <span className={`font-semibold ${(Number(acc.amount) || 0) >= 0 ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]"}`}>
+                      ₹{(Number(acc.amount) || 0).toLocaleString()}
                     </span>
                     <div className="flex gap-2 text-gray-400 ml-2">
                       <button 

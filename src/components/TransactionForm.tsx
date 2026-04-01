@@ -23,11 +23,17 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
   const [date, setDate] = useState(
     transaction?.date || new Date().toISOString().split("T")[0]
   );
-  const [accountId, setAccountId] = useState<number | "">(
-    transaction?.account_id || ""
+  const [fromAccountId, setFromAccountId] = useState<number | "">(
+    transaction?.from_account_id || ""
   );
   const [toAccountId, setToAccountId] = useState<number | "">(
     transaction?.to_account_id || ""
+  );
+  const [showFromAccount, setShowFromAccount] = useState(
+    !!(transaction?.from_account_id)
+  );
+  const [showToAccount, setShowToAccount] = useState(
+    !!(transaction?.to_account_id)
   );
   const [selectedTags, setSelectedTags] = useState<number[]>(
     transaction?.tags || []
@@ -79,6 +85,10 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
       setError("Please enter a valid amount");
       return;
     }
+    if (type === "transfer" && (!fromAccountId || !toAccountId)) {
+      setError("Transfer requires both From and To accounts");
+      return;
+    }
     setSaving(true);
     const body: TransactionBody = {
       date,
@@ -86,7 +96,7 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
       type,
       notes: notes || undefined,
       tags: selectedTags.length > 0 ? selectedTags : undefined,
-      account_id: accountId ? Number(accountId) : undefined,
+      from_account_id: fromAccountId ? Number(fromAccountId) : undefined,
       to_account_id: toAccountId ? Number(toAccountId) : undefined,
     };
     try {
@@ -117,6 +127,7 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
 
       <div className="screen-body">
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          {/* Type */}
           <div className="sketch-field">
             <select
               className="sketch-select"
@@ -129,38 +140,7 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
             </select>
           </div>
 
-          <div className="sketch-field">
-            <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">
-              {type === "income" ? "Deposit In (Debit +)" : "Pay From (Credit -)"}
-            </label>
-            <select
-              className="sketch-select"
-              value={accountId}
-              onChange={e => setAccountId(e.target.value ? Number(e.target.value) : "")}
-            >
-              <option value="">
-                {type === "income" ? "Select Destination Account" : "Select Source Account"}
-              </option>
-              {allAccounts?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-            </select>
-          </div>
-
-          <div className="sketch-field">
-            <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">
-              {type === "income" ? "Source (Credit -)" : "Towards (Debit +)"}
-            </label>
-            <select
-              className="sketch-select"
-              value={toAccountId}
-              onChange={e => setToAccountId(e.target.value ? Number(e.target.value) : "")}
-            >
-              <option value="">
-                {type === "transfer" ? "Select Destination Account" : "Optional Account"}
-              </option>
-              {allAccounts?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-            </select>
-          </div>
-
+          {/* Amount */}
           <div className="sketch-field">
             <input
               className="sketch-input"
@@ -174,6 +154,7 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
             />
           </div>
 
+          {/* Notes */}
           <div className="sketch-field">
             <textarea
               className="sketch-textarea"
@@ -184,6 +165,7 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
             />
           </div>
 
+          {/* Date */}
           <div className="sketch-field">
             <input
               className="sketch-input"
@@ -194,11 +176,10 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
             />
           </div>
 
-          {/* Tags section — always visible */}
+          {/* Tags section */}
           <div className="sketch-field">
             <label className="field-label mb-2 block">Tags</label>
 
-            {/* Existing tags to select */}
             {allTags && allTags.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
                 {allTags.map((tag) => {
@@ -218,7 +199,6 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
               </div>
             )}
 
-            {/* Inline new tag creation */}
             <div className="flex gap-2">
               <input
                 className="sketch-input flex-1 text-sm py-1.5"
@@ -238,6 +218,76 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
                 {creatingTag ? "…" : "Add Tag"}
               </button>
             </div>
+          </div>
+
+          {/* From Account — hidden by default, shown via toggle */}
+          <div className="sketch-field">
+            {!showFromAccount ? (
+              <button
+                type="button"
+                className="sketch-btn text-sm flex items-center gap-1 text-muted-foreground w-full justify-start"
+                onClick={() => setShowFromAccount(true)}
+              >
+                <Plus size={13} />
+                {type === "transfer" ? "Add From Account (required)" : "Add From Account"}
+              </button>
+            ) : (
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider">From Account</label>
+                  <button
+                    type="button"
+                    onClick={() => { setShowFromAccount(false); setFromAccountId(""); }}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <X size={13} />
+                  </button>
+                </div>
+                <select
+                  className="sketch-select"
+                  value={fromAccountId}
+                  onChange={e => setFromAccountId(e.target.value ? Number(e.target.value) : "")}
+                >
+                  <option value="">Select account…</option>
+                  {allAccounts?.map(a => <option key={a.id} value={a.id}>{a.name} ({a.group})</option>)}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* To Account — hidden by default, shown via toggle */}
+          <div className="sketch-field">
+            {!showToAccount ? (
+              <button
+                type="button"
+                className="sketch-btn text-sm flex items-center gap-1 text-muted-foreground w-full justify-start"
+                onClick={() => setShowToAccount(true)}
+              >
+                <Plus size={13} />
+                {type === "transfer" ? "Add To Account (required)" : "Add To Account"}
+              </button>
+            ) : (
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider">To Account</label>
+                  <button
+                    type="button"
+                    onClick={() => { setShowToAccount(false); setToAccountId(""); }}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <X size={13} />
+                  </button>
+                </div>
+                <select
+                  className="sketch-select"
+                  value={toAccountId}
+                  onChange={e => setToAccountId(e.target.value ? Number(e.target.value) : "")}
+                >
+                  <option value="">Select account…</option>
+                  {allAccounts?.map(a => <option key={a.id} value={a.id}>{a.name} ({a.group})</option>)}
+                </select>
+              </div>
+            )}
           </div>
 
           {error && <p className="text-sm text-red-600">{error}</p>}

@@ -57,9 +57,9 @@ export interface Account {
   id: number;
   name: string;
   group: "Cash" | "Accounts" | "Investment" | "Loan" | "Insurance" | "Saving";
-  balance?: number;
+  starting_balance?: number;
+  amount?: number;         // current balance
   monthly_change?: number;
-  amount?: number;
   description?: string;
   is_connected?: boolean;
   transaction_count?: number;
@@ -74,10 +74,8 @@ export interface Transaction {
   notes?: string;
   tags?: number[];        // array of tag IDs
   tag_objects?: Tag[];   // full tag details
-  account_id?: number;
+  from_account_id?: number;
   to_account_id?: number;
-  credit_account_id?: number;
-  debit_account_id?: number;
 }
 
 export interface Plan {
@@ -109,10 +107,8 @@ export interface TransactionBody {
   title?: string;
   notes?: string;
   tags?: number[]; // array of tag IDs to attach
-  account_id?: number;
+  from_account_id?: number;
   to_account_id?: number;
-  credit_account_id?: number;
-  debit_account_id?: number;
 }
 
 export interface AccountBody {
