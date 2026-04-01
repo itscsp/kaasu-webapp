@@ -130,23 +130,33 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
           </div>
 
           <div className="sketch-field">
+            <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">
+              {type === "income" ? "Deposit In (Debit +)" : "Pay From (Credit -)"}
+            </label>
             <select
               className="sketch-select"
               value={accountId}
               onChange={e => setAccountId(e.target.value ? Number(e.target.value) : "")}
             >
-              <option value="">{type === "transfer" ? "Select Source Account" : "Select Primary Account"}</option>
+              <option value="">
+                {type === "income" ? "Select Destination Account" : "Select Source Account"}
+              </option>
               {allAccounts?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
             </select>
           </div>
 
           <div className="sketch-field">
+            <label className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1 block">
+              {type === "income" ? "Source (Credit -)" : "Towards (Debit +)"}
+            </label>
             <select
               className="sketch-select"
               value={toAccountId}
               onChange={e => setToAccountId(e.target.value ? Number(e.target.value) : "")}
             >
-              <option value="">{type === "transfer" ? "Select Destination Account" : "Select Secondary Account (Optional)"}</option>
+              <option value="">
+                {type === "transfer" ? "Select Destination Account" : "Optional Account"}
+              </option>
               {allAccounts?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
             </select>
           </div>

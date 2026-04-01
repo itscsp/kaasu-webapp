@@ -76,6 +76,8 @@ export interface Transaction {
   tag_objects?: Tag[];   // full tag details
   account_id?: number;
   to_account_id?: number;
+  credit_account_id?: number;
+  debit_account_id?: number;
 }
 
 export interface Plan {
@@ -109,6 +111,8 @@ export interface TransactionBody {
   tags?: number[]; // array of tag IDs to attach
   account_id?: number;
   to_account_id?: number;
+  credit_account_id?: number;
+  debit_account_id?: number;
 }
 
 export interface AccountBody {

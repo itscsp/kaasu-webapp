@@ -111,18 +111,21 @@ export default function AccountsPage({ onBack }: Props) {
     
     if (accountTransactions) {
       accountTransactions.forEach(tx => {
-        let multiplier = 1;
+        const isDebit = tx.debit_account_id === viewingAccount.id || 
+                       (tx.type === 'income' && tx.account_id === viewingAccount.id) || 
+                       ((tx.type === 'transfer' || tx.type === 'expenses') && tx.to_account_id === viewingAccount.id);
+        const isCredit = tx.credit_account_id === viewingAccount.id || 
+                        (tx.type === 'expenses' && tx.account_id === viewingAccount.id) || 
+                        (tx.type === 'transfer' && tx.account_id === viewingAccount.id) ||
+                        (tx.type === 'income' && tx.to_account_id === viewingAccount.id);
+        
+        let multiplier = 0;
         const group = viewingAccount.group;
-        if (tx.type === 'transfer') {
-          if (tx.account_id === viewingAccount.id) {
-            multiplier = ['Loan', 'Insurance'].includes(group) ? 1 : -1;
-          } else if (tx.to_account_id === viewingAccount.id) {
-            multiplier = ['Loan', 'Insurance'].includes(group) ? -1 : 1;
-          }
-        } else if (tx.type === 'expenses') {
-          multiplier = ['Investment'].includes(group) ? 1 : -1;
-        } else if (tx.type === 'income') {
-          multiplier = ['Investment'].includes(group) ? -1 : 1;
+        
+        if (isDebit) {
+          multiplier = ['Loan', 'Insurance'].includes(group) ? -1 : 1;
+        } else if (isCredit) {
+          multiplier = ['Loan', 'Insurance'].includes(group) ? 1 : -1;
         }
         
         const impactAmount = Number(tx.amount) * multiplier;
@@ -233,18 +236,21 @@ export default function AccountsPage({ onBack }: Props) {
                 <p className="text-center text-sm text-gray-500 py-4">No linked transactions.</p>
               )}
               {!txLoading && accountTransactions && accountTransactions.map(tx => {
-                let multiplier = 1;
+                const isDebit = tx.debit_account_id === viewingAccount.id || 
+                               (tx.type === 'income' && tx.account_id === viewingAccount.id) || 
+                               ((tx.type === 'transfer' || tx.type === 'expenses') && tx.to_account_id === viewingAccount.id);
+                const isCredit = tx.credit_account_id === viewingAccount.id || 
+                                (tx.type === 'expenses' && tx.account_id === viewingAccount.id) || 
+                                (tx.type === 'transfer' && tx.account_id === viewingAccount.id) ||
+                                (tx.type === 'income' && tx.to_account_id === viewingAccount.id);
+                
+                let multiplier = 0;
                 const group = viewingAccount.group;
-                if (tx.type === 'transfer') {
-                  if (tx.account_id === viewingAccount.id) {
-                    multiplier = ['Loan', 'Insurance'].includes(group) ? 1 : -1;
-                  } else if (tx.to_account_id === viewingAccount.id) {
-                    multiplier = ['Loan', 'Insurance'].includes(group) ? -1 : 1;
-                  }
-                } else if (tx.type === 'expenses') {
-                  multiplier = ['Investment'].includes(group) ? 1 : -1;
-                } else if (tx.type === 'income') {
-                  multiplier = ['Investment'].includes(group) ? -1 : 1;
+                
+                if (isDebit) {
+                  multiplier = ['Loan', 'Insurance'].includes(group) ? -1 : 1;
+                } else if (isCredit) {
+                  multiplier = ['Loan', 'Insurance'].includes(group) ? 1 : -1;
                 }
                 
                 const impactAmount = Number(tx.amount) * multiplier;
@@ -264,7 +270,7 @@ export default function AccountsPage({ onBack }: Props) {
                       </span>
                       {otherAccount && (
                         <span className="text-[10px] text-[hsl(var(--muted-foreground))] mt-0.5 truncate">
-                          {tx.account_id === viewingAccount.id ? "Towards |" : "From |"} {otherAccount.name}
+                          {isCredit ? "Towards |" : "From |"} {otherAccount.name}
                         </span>
                       )}
                     </div>
