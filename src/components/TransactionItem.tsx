@@ -19,7 +19,7 @@ export default function TransactionItem({ transaction, onEdit, onDelete }: Props
   const day = dateObj.getDate();
 
   const { accounts } = useData();
-  const fromAccount = accounts?.find(a => a.id === transaction.account_id);
+  const fromAccount = accounts?.find(a => a.id === transaction.from_account_id);
   const toAccount = accounts?.find(a => a.id === transaction.to_account_id);
 
   return (
@@ -48,15 +48,28 @@ export default function TransactionItem({ transaction, onEdit, onDelete }: Props
       {expanded && (
         <div className="transaction-detail">
           {(fromAccount || toAccount) && (
-            <div className="flex items-center gap-2 text-[10px] text-[hsl(var(--muted-foreground))] mb-3 bg-white/5 p-2 rounded-md border border-white/5">
-              {fromAccount && (
-                <span className="truncate max-w-[45%] font-medium text-[hsl(var(--foreground))]">{fromAccount.name}</span>
-              )}
-              {fromAccount && toAccount && (
-                <ArrowRight size={10} className="flex-shrink-0 opacity-50" />
-              )}
-              {toAccount && (
-                <span className="truncate max-w-[45%] font-medium text-[hsl(var(--foreground))]">{toAccount.name}</span>
+            <div className="flex items-center gap-2 text-[9px] text-[hsl(var(--muted-foreground))] mb-3 bg-white/5 p-2 rounded-lg border border-white/5 overflow-hidden">
+              {transaction.type === 'transfer' ? (
+                <>
+                  <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                    <span className="text-[7px] font-bold uppercase tracking-widest text-gray-600">From</span>
+                    <span className="truncate font-medium text-[hsl(var(--foreground))]">{fromAccount?.name || "???"}</span>
+                  </div>
+                  <ArrowRight size={10} className="flex-shrink-0 opacity-50 mt-2" />
+                  <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                    <span className="text-[7px] font-bold uppercase tracking-widest text-gray-600">To</span>
+                    <span className="truncate font-medium text-[hsl(var(--foreground))]">{toAccount?.name || "???"}</span>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                  <span className="text-[7px] font-bold uppercase tracking-widest text-gray-600">
+                    {transaction.type === 'income' ? 'Deposited To' : 'Paid From'}
+                  </span>
+                  <span className="truncate font-medium text-[hsl(var(--foreground))]">
+                    {(transaction.type === 'income' ? toAccount?.name : fromAccount?.name) || "Not connected"}
+                  </span>
+                </div>
               )}
             </div>
           )}

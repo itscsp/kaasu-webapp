@@ -60,7 +60,7 @@ export default function AccountsPage({ onBack }: Props) {
   function handleEdit(acc: Account) {
     setName(acc.name);
     setGroup(acc.group);
-    setAmount(String(acc.starting_balance ?? acc.amount ?? 0));
+    setAmount(String(acc.starting_balance ?? acc.amount ?? acc.balance ?? 0));
     setDescription(acc.description || "");
     setEditingId(acc.id);
     setShowForm(true);
@@ -106,7 +106,7 @@ export default function AccountsPage({ onBack }: Props) {
   }
 
   if (viewingAccount) {
-    const currentBalance = Number(viewingAccount.amount) || 0;
+    const currentBalance = Number(viewingAccount.amount ?? viewingAccount.balance) || 0;
     const startingBalance = Number(viewingAccount.starting_balance) || 0;
     
     // Group analysis
@@ -399,7 +399,7 @@ export default function AccountsPage({ onBack }: Props) {
                     <div className="flex flex-col items-end">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="account-amount">
-                          ₹{(Number(acc.amount) || 0).toLocaleString()}
+                          ₹{(Number(acc.amount ?? acc.balance) || 0).toLocaleString()}
                         </span>
                         <div className="account-actions">
                           <button 

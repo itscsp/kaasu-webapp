@@ -59,6 +59,7 @@ export interface Account {
   group: "Cash" | "Accounts" | "Investment" | "Loan" | "Insurance" | "Saving";
   starting_balance?: number;
   amount?: number;         // current balance
+  balance?: number;        // legacy balance field
   monthly_change?: number;
   description?: string;
   is_connected?: boolean;
