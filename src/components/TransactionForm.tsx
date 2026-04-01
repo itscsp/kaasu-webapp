@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, Transaction, TransactionBody } from "@/lib/api";
 import { useData } from "@/context/DataContext";
-import { X, Plus } from "lucide-react";
 
 interface Props {
   budgetId: number;
@@ -11,7 +10,7 @@ interface Props {
 }
 
 export default function TransactionForm({ budgetId, transaction, onSave, onBack }: Props) {
-  const { tags: allTags, fetchTags, invalidateTags, accounts: allAccounts, fetchAccounts } = useData();
+  const { tags: allTags, fetchTags, accounts: allAccounts, fetchAccounts } = useData();
   const isEdit = !!transaction;
   const [type, setType] = useState<"income" | "expenses" | "transfer">(
     transaction?.type || "expenses"
@@ -29,17 +28,9 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
   const [toAccountId, setToAccountId] = useState<number | "">(
     transaction?.to_account_id || ""
   );
-  const [showFromAccount, setShowFromAccount] = useState(
-    !!(transaction?.from_account_id)
-  );
-  const [showToAccount, setShowToAccount] = useState(
-    !!(transaction?.to_account_id)
-  );
   const [selectedTags, setSelectedTags] = useState<number[]>(
     transaction?.tags || []
   );
-  const [newTagName, setNewTagName] = useState("");
-  const [creatingTag, setCreatingTag] = useState(false);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -54,29 +45,6 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
     );
   }
 
-  async function handleCreateTag() {
-    const name = newTagName.trim();
-    if (!name) return;
-    setCreatingTag(true);
-    try {
-      const created = await api.tags.create(name);
-      invalidateTags();
-      await fetchTags(true);
-      setSelectedTags((prev) => [...prev, created.id]);
-      setNewTagName("");
-    } catch {
-      setError("Failed to create tag");
-    } finally {
-      setCreatingTag(false);
-    }
-  }
-
-  function handleNewTagKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleCreateTag();
-    }
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -120,184 +88,139 @@ export default function TransactionForm({ budgetId, transaction, onSave, onBack 
           Back
         </button>
         <span className="header-title">
-          {isEdit ? "Edit Transaction" : "Add Transaction"}
+          {isEdit ? "Edit Transaction" : "New Transaction"}
         </span>
         <span className="w-12" />
       </div>
 
-      <div className="screen-body">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          {/* Type */}
-          <div className="sketch-field">
-            <select
-              className="sketch-select"
-              value={type}
-              onChange={(e) => setType(e.target.value as "income" | "expenses" | "transfer")}
-            >
-              <option value="expenses">Expenses</option>
-              <option value="income">Income</option>
-              <option value="transfer">Transfer</option>
-            </select>
-          </div>
-
-          {/* Amount */}
-          <div className="sketch-field">
-            <input
-              className="sketch-input"
-              type="number"
-              placeholder="Amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              required
-              min="0"
-              step="0.01"
-            />
-          </div>
-
-          {/* Notes */}
-          <div className="sketch-field">
-            <textarea
-              className="sketch-textarea"
-              placeholder="Notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={3}
-            />
-          </div>
-
-          {/* Date */}
-          <div className="sketch-field">
-            <input
-              className="sketch-input"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
-            />
-          </div>
-
-          {/* Tags section */}
-          <div className="sketch-field">
-            <label className="field-label mb-2 block">Tags</label>
-
-            {allTags && allTags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-2">
-                {allTags.map((tag) => {
-                  const selected = selectedTags.includes(tag.id);
-                  return (
-                    <button
-                      key={tag.id}
-                      type="button"
-                      onClick={() => toggleTag(tag.id)}
-                      className={`tag-badge cursor-pointer ${selected ? "tag-badge-selected" : ""}`}
-                    >
-                      {selected && <X size={10} className="inline mr-0.5" />}
-                      {tag.name}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            <div className="flex gap-2">
-              <input
-                className="sketch-input flex-1 text-sm py-1.5"
-                type="text"
-                placeholder="New tag…"
-                value={newTagName}
-                onChange={(e) => setNewTagName(e.target.value)}
-                onKeyDown={handleNewTagKeyDown}
-              />
+      <div className="screen-body py-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          {/* Type Selector (Custom Segmented Control) */}
+          <div className="flex bg-white/5 p-1 rounded-xl border border-white/5">
+            {(["expenses", "income", "transfer"] as const).map((t) => (
               <button
+                key={t}
                 type="button"
-                onClick={handleCreateTag}
-                disabled={creatingTag || !newTagName.trim()}
-                className="sketch-btn flex items-center gap-1 px-3 py-1.5 text-sm whitespace-nowrap"
+                onClick={() => setType(t)}
+                className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all ${
+                  type === t 
+                    ? "bg-[hsl(var(--primary))] text-white shadow-lg" 
+                    : "text-gray-500 hover:text-gray-300"
+                }`}
               >
-                <Plus size={13} />
-                {creatingTag ? "…" : "Add Tag"}
+                {t}
               </button>
+            ))}
+          </div>
+
+          {/* Amount Input */}
+          <div className="relative">
+             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-bold text-gray-500">₹</div>
+             <input
+                className="w-full bg-white/5 border border-white/10 rounded-2xl py-6 pl-10 pr-4 text-3xl font-bold text-[hsl(var(--primary))] outline-none focus:border-[hsl(var(--primary))]/30 transition-all placeholder:text-gray-800"
+                type="number"
+                placeholder="0.00"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                required
+                min="0"
+                step="0.01"
+              />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4">
+            {/* Notes */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-gray-600 uppercase tracking-widest ml-1">Notes</label>
+              <textarea
+                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-gray-200 outline-none focus:border-[hsl(var(--primary))]/30 transition-all placeholder:text-gray-700"
+                placeholder="What was this for?"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={2}
+              />
+            </div>
+
+            {/* Date */}
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-gray-600 uppercase tracking-widest ml-1">Date</label>
+              <input
+                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-gray-200 outline-none focus:border-[hsl(var(--primary))]/30 transition-all"
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                required
+              />
             </div>
           </div>
 
-          {/* From Account — hidden by default, shown via toggle */}
-          <div className="sketch-field">
-            {!showFromAccount ? (
-              <button
-                type="button"
-                className="sketch-btn text-sm flex items-center gap-1 text-muted-foreground w-full justify-start"
-                onClick={() => setShowFromAccount(true)}
+          {/* Accounts Section */}
+          {(type === "expenses" || type === "transfer") && (
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-gray-600 uppercase tracking-widest ml-1">
+                {type === "transfer" ? "From Account" : "Paid From"}
+              </label>
+              <select
+                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-gray-200 outline-none focus:border-[hsl(var(--primary))]/30 transition-all appearance-none"
+                value={fromAccountId}
+                onChange={e => setFromAccountId(e.target.value ? Number(e.target.value) : "")}
+                required={type === "transfer"}
               >
-                <Plus size={13} />
-                {type === "transfer" ? "Add From Account (required)" : "Add From Account"}
-              </button>
-            ) : (
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider">From Account</label>
+                <option value="" className="bg-[#1c1f26]">Select account...</option>
+                {allAccounts?.map(a => <option key={a.id} value={a.id} className="bg-[#1c1f26]">{a.name}</option>)}
+              </select>
+            </div>
+          )}
+
+          {(type === "income" || type === "transfer") && (
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-gray-600 uppercase tracking-widest ml-1">
+                {type === "transfer" ? "To Account" : "Deposited To"}
+              </label>
+              <select
+                className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-sm text-gray-200 outline-none focus:border-[hsl(var(--primary))]/30 transition-all appearance-none"
+                value={toAccountId}
+                onChange={e => setToAccountId(e.target.value ? Number(e.target.value) : "")}
+                required={type === "transfer"}
+              >
+                <option value="" className="bg-[#1c1f26]">Select account...</option>
+                {allAccounts?.map(a => <option key={a.id} value={a.id} className="bg-[#1c1f26]">{a.name}</option>)}
+              </select>
+            </div>
+          )}
+
+          {/* Tags */}
+          <div className="space-y-3 pt-2">
+            <label className="text-[10px] font-bold text-gray-600 uppercase tracking-widest ml-1">Tags</label>
+            <div className="flex flex-wrap gap-2">
+              {allTags?.map((tag) => {
+                const selected = selectedTags.includes(tag.id);
+                return (
                   <button
+                    key={tag.id}
                     type="button"
-                    onClick={() => { setShowFromAccount(false); setFromAccountId(""); }}
-                    className="text-muted-foreground hover:text-foreground"
+                    onClick={() => toggleTag(tag.id)}
+                    className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all ${
+                      selected 
+                        ? "bg-[hsl(var(--primary))]/10 border-[hsl(var(--primary))]/40 text-[hsl(var(--primary))]" 
+                        : "bg-white/5 border-white/5 text-gray-500 hover:text-gray-300"
+                    }`}
                   >
-                    <X size={13} />
+                    {tag.name}
                   </button>
-                </div>
-                <select
-                  className="sketch-select"
-                  value={fromAccountId}
-                  onChange={e => setFromAccountId(e.target.value ? Number(e.target.value) : "")}
-                >
-                  <option value="">Select account…</option>
-                  {allAccounts?.map(a => <option key={a.id} value={a.id}>{a.name} ({a.group})</option>)}
-                </select>
-              </div>
-            )}
+                );
+              })}
+            </div>
           </div>
 
-          {/* To Account — hidden by default, shown via toggle */}
-          <div className="sketch-field">
-            {!showToAccount ? (
-              <button
-                type="button"
-                className="sketch-btn text-sm flex items-center gap-1 text-muted-foreground w-full justify-start"
-                onClick={() => setShowToAccount(true)}
-              >
-                <Plus size={13} />
-                {type === "transfer" ? "Add To Account (required)" : "Add To Account"}
-              </button>
-            ) : (
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-[10px] text-muted-foreground uppercase tracking-wider">To Account</label>
-                  <button
-                    type="button"
-                    onClick={() => { setShowToAccount(false); setToAccountId(""); }}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <X size={13} />
-                  </button>
-                </div>
-                <select
-                  className="sketch-select"
-                  value={toAccountId}
-                  onChange={e => setToAccountId(e.target.value ? Number(e.target.value) : "")}
-                >
-                  <option value="">Select account…</option>
-                  {allAccounts?.map(a => <option key={a.id} value={a.id}>{a.name} ({a.group})</option>)}
-                </select>
-              </div>
-            )}
-          </div>
-
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-xs font-bold text-[hsl(0_80%_65%)] uppercase tracking-widest text-center mt-2">{error}</p>}
 
           <button
             type="submit"
-            className="sketch-btn sketch-btn-primary mt-1"
+            className="w-full bg-white text-black font-extrabold uppercase tracking-[0.2em] py-5 rounded-2xl shadow-2xl shadow-white/5 hover:scale-[1.01] active:scale-[0.98] transition-all mt-4 disabled:opacity-50"
             disabled={saving}
           >
-            {saving ? "Saving…" : isEdit ? "Update" : "Add"}
+            {saving ? "Saving..." : isEdit ? "Update Transaction" : "Create Transaction"}
           </button>
         </form>
       </div>

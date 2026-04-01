@@ -700,3 +700,51 @@ button.tag-badge:hover {
   border-radius: 6px;
   padding: 7px 10px;
 }
+
+@media (max-width: 480px) {
+  :root {
+    --radius: 10px;
+  }
+  
+  html {
+    font-size: 14px;
+  }
+
+  .phone-frame {
+    border: none;
+  }
+
+  .screen-header {
+    padding: 12px 12px 0px;
+  }
+
+  .header-title {
+    font-size: 1rem;
+  }
+
+  .transaction-notes {
+    font-size: 0.85rem;
+  }
+
+  .transaction-amount {
+    font-size: 0.95rem;
+  }
+
+  .account-name {
+    font-size: 0.95rem;
+  }
+
+  .account-amount {
+    font-size: 1rem;
+  }
+
+  .group-badge {
+    font-size: 8px;
+    padding: 1px 6px;
+  }
+
+  .txn-chip {
+    font-size: 8px;
+    padding: 1px 6px;
+  }
+}

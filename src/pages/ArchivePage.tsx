@@ -52,11 +52,16 @@ export default function ArchivePage({ onSelectBudget, onBack }: Props) {
           sortedBudgets.map((b) => (
             <button
               key={b.id}
-              className="archive-row"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 mb-3 flex items-center justify-between hover:bg-white/10 transition-all active:scale-[0.98] group"
               onClick={() => onSelectBudget(b.id)}
             >
-              <span className="archive-row-title">{b.title}</span>
-              <ChevronRight size={16} className="text-gray-500" />
+              <div className="flex flex-col items-start gap-1">
+                <span className="text-base font-semibold text-gray-200 group-hover:text-white transition-colors">{b.title}</span>
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-2 py-0.5 bg-white/5 rounded-md border border-white/5">Budget Archive</span>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-500 group-hover:text-white group-hover:bg-white/10 transition-all">
+                <ChevronRight size={18} />
+              </div>
             </button>
           ))}
       </div>
