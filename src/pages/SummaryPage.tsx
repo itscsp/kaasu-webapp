@@ -86,7 +86,15 @@ export default function SummaryPage({ budgetId, onBack }: Props) {
                       
                       <div className="flex justify-between items-center mt-1 pt-2 border-t border-[hsl(var(--border))]">
                         <span className="text-xs text-[hsl(var(--muted-foreground))]">This Month's Change</span>
-                        <span className={`text-sm font-medium ${acc.monthly_change && acc.monthly_change > 0 ? "text-[hsl(var(--primary))]" : acc.monthly_change && acc.monthly_change < 0 ? "text-[hsl(var(--destructive))]" : "text-[hsl(var(--foreground))]"}`}>
+                        <span className={`text-sm font-medium ${
+                          (() => {
+                            const change = acc.monthly_change || 0;
+                            if (change === 0) return "text-[hsl(var(--foreground))]";
+                            const isLiability = ['Loan', 'Insurance'].includes(acc.group);
+                            const isImprovement = isLiability ? change < 0 : change > 0;
+                            return isImprovement ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]";
+                          })()
+                        }`}>
                           {acc.monthly_change && acc.monthly_change > 0 ? "+" : ""}
                           ₹{(acc.monthly_change || 0).toLocaleString()}
                         </span>
