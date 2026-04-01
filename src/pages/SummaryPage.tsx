@@ -102,8 +102,8 @@ export default function SummaryPage({ budgetId, onBack }: Props) {
                         
                         <div className="flex flex-col items-end">
                            <span className="text-[8px] font-bold text-gray-600 uppercase tracking-widest mb-1">Total Bal</span>
-                           <span className={`text-sm font-bold ${(Number(acc.amount) || 0) >= 0 ? "text-gray-200" : "text-[hsl(0_80%_65%)]"}`}>
-                             ₹{(Number(acc.amount) || 0).toLocaleString()}
+                           <span className={`text-sm font-bold ${(Number(acc.amount ?? acc.balance) || 0) >= 0 ? "text-gray-200" : "text-[hsl(0_80%_65%)]"}`}>
+                             ₹{(Number(acc.amount ?? acc.balance) || 0).toLocaleString()}
                            </span>
                         </div>
                       </div>
