@@ -26,6 +26,10 @@ export default function SummaryPage({ budgetId }: Props) {
 
   const summary = budgetId ? budgetDetails[budgetId]?.summary : null;
 
+  const totalAvailable = summary?.accounts
+    ?.filter((a: any) => a.group === 'Accounts' || a.group === 'Cash')
+    ?.reduce((sum: number, a: any) => sum + (Number(a.amount ?? a.balance) || 0), 0) || 0;
+
   return (
     <div className="phone-frame">
       <div className="screen-header">
@@ -61,6 +65,13 @@ export default function SummaryPage({ budgetId }: Props) {
                   <span className="text-sm font-bold text-gray-200">Net Balance</span>
                   <span className={`text-xl font-bold ${(Number(summary.net_balance) || 0) >= 0 ? "text-[hsl(150_70%_55%)]" : "text-[hsl(0_80%_65%)]"}`}>
                     ₹{(Number(summary.net_balance) || 0).toLocaleString()}
+                  </span>
+                </div>
+                
+                <div className="flex justify-between items-center p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20">
+                  <span className="text-sm font-bold text-gray-200">Total Available (Bank + Cash)</span>
+                  <span className={`text-xl font-bold ${totalAvailable >= 0 ? "text-blue-400" : "text-red-400"}`}>
+                    ₹{totalAvailable.toLocaleString()}
                   </span>
                 </div>
               </div>
