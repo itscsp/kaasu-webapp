@@ -118,7 +118,7 @@ export default function HomePage({ onLogout }: Props) {
       <Route path="/tags" element={<TagsPage />} />
       <Route path="/accounts" element={<AccountsPage />} />
       <Route path="/accounts/:id" element={<AccountDetailsPage />} />
-      <Route path="/summary" element={<SummaryPage />} />
+      <Route path="/summary" element={<SummaryPage budgetId={currentBudget.id} />} />
       <Route path="/profile" element={<ProfilePage onLogout={onLogout} />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
