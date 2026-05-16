@@ -3,11 +3,10 @@ import { api } from "@/lib/api";
 import { useData } from "@/context/DataContext";
 import { X, Plus } from "lucide-react";
 
-interface Props {
-  onBack: () => void;
-}
+import { useNavigate } from "react-router-dom";
 
-export default function TagsPage({ onBack }: Props) {
+export default function TagsPage() {
+  const navigate = useNavigate();
   const { tags, fetchTags, invalidateTags } = useData();
   const [newTag, setNewTag] = useState("");
   const [loading, setLoading] = useState(true);
@@ -55,7 +54,7 @@ export default function TagsPage({ onBack }: Props) {
   return (
     <div className="phone-frame">
       <div className="screen-header">
-        <button onClick={onBack} className="header-action-btn">
+        <button onClick={() => navigate(-1)} className="header-action-btn">
           Back
         </button>
         <span className="header-title">Tags</span>

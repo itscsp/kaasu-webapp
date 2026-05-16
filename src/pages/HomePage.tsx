@@ -1,33 +1,25 @@
 import { useEffect, useState } from "react";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { api, Budget } from "@/lib/api";
 import { useData } from "@/context/DataContext";
 import BudgetPage from "./BudgetPage";
 import ArchivePage from "./ArchivePage";
 import TagsPage from "./TagsPage";
 import AccountsPage from "./AccountsPage";
+import AccountDetailsPage from "./AccountDetailsPage";
 import ProfilePage from "./ProfilePage";
 import SummaryPage from "./SummaryPage";
-import { clearCredentials } from "@/lib/auth";
 
 interface Props {
   onLogout: () => void;
 }
 
-type View =
-  | { type: "current" }
-  | { type: "budget"; id: number }
-  | { type: "archive" }
-  | { type: "tags" }
-  | { type: "accounts" }
-  | { type: "summary" }
-  | { type: "profile" };
-
 export default function HomePage({ onLogout }: Props) {
-  const [view, setView] = useState<View>({ type: "current" });
   const [currentBudget, setCurrentBudget] = useState<Budget | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [creatingBudget, setCreatingBudget] = useState(false);
+  const navigate = useNavigate();
 
   const { budgets, fetchBudgets, invalidateBudgets } = useData();
 
@@ -73,70 +65,6 @@ export default function HomePage({ onLogout }: Props) {
     }
   }
 
-  function handleLogout() {
-    clearCredentials();
-    onLogout();
-  }
-
-  if (view.type === "archive") {
-    return (
-      <ArchivePage
-        onSelectBudget={(id) => setView({ type: "budget", id })}
-        onBack={() => setView({ type: "current" })}
-      />
-    );
-  }
-
-  if (view.type === "tags") {
-    return (
-      <TagsPage
-        onBack={() => setView({ type: "current" })}
-      />
-    );
-  }
-
-  if (view.type === "accounts") {
-    return (
-      <AccountsPage
-        onBack={() => setView({ type: "current" })}
-      />
-    );
-  }
-
-  if (view.type === "summary") {
-    return (
-      <SummaryPage
-        budgetId={currentBudget?.id}
-        onBack={() => setView({ type: "current" })}
-      />
-    );
-  }
-
-  if (view.type === "profile") {
-    return (
-      <ProfilePage
-        onBack={() => setView({ type: "current" })}
-        onShowTags={() => setView({ type: "tags" })}
-        onShowSummary={() => setView({ type: "summary" })}
-        onShowArchive={() => setView({ type: "archive" })}
-        onLogout={handleLogout}
-      />
-    );
-  }
-
-  if (view.type === "budget") {
-    return (
-      <BudgetPage
-        budgetId={view.id}
-        onBack={() => setView({ type: "current" })}
-        onShowSummary={() => setView({ type: "summary" })}
-        onShowAccounts={() => setView({ type: "accounts" })}
-        onShowProfile={() => setView({ type: "profile" })}
-        isCurrentMonth={false}
-      />
-    );
-  }
-
   if (loading) {
     return (
       <div className="phone-frame">
@@ -152,7 +80,7 @@ export default function HomePage({ onLogout }: Props) {
       <div className="phone-frame">
         <div className="flex flex-col items-center justify-center h-full gap-4 p-6">
           <p className="text-sm text-red-600">{error}</p>
-          <button onClick={handleLogout} className="sketch-btn">
+          <button onClick={onLogout} className="sketch-btn">
             Logout
           </button>
         </div>
@@ -183,13 +111,16 @@ export default function HomePage({ onLogout }: Props) {
   }
 
   return (
-    <BudgetPage
-      budgetId={currentBudget.id}
-      onBack={handleLogout}
-      onShowSummary={() => setView({ type: "summary" })}
-      onShowAccounts={() => setView({ type: "accounts" })}
-      onShowProfile={() => setView({ type: "profile" })}
-      isCurrentMonth={true}
-    />
+    <Routes>
+      <Route path="/" element={<BudgetPage budgetId={currentBudget.id} isCurrentMonth={true} />} />
+      <Route path="/budget/:id" element={<BudgetPage isCurrentMonth={false} />} />
+      <Route path="/archive" element={<ArchivePage />} />
+      <Route path="/tags" element={<TagsPage />} />
+      <Route path="/accounts" element={<AccountsPage />} />
+      <Route path="/accounts/:id" element={<AccountDetailsPage />} />
+      <Route path="/summary" element={<SummaryPage />} />
+      <Route path="/profile" element={<ProfilePage onLogout={onLogout} />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }

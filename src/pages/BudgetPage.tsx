@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { api, Transaction } from "@/lib/api";
 import { useData } from "@/context/DataContext";
 import TransactionItem from "@/components/TransactionItem";
@@ -7,22 +8,16 @@ import PlansSection from "@/components/PlansSection";
 import { BarChart2, Home, Landmark, User } from "lucide-react";
 
 interface Props {
-  budgetId: number;
-  onBack: () => void;
-  onShowSummary: () => void;
-  onShowAccounts: () => void;
-  onShowProfile: () => void;
+  budgetId?: number;
   isCurrentMonth?: boolean;
 }
 
-export default function BudgetPage({
-  budgetId,
-  onBack,
-  onShowSummary,
-  onShowAccounts,
-  onShowProfile,
-  isCurrentMonth = false,
-}: Props) {
+export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = false }: Props) {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  
+  const budgetId = propsBudgetId ?? (id ? parseInt(id, 10) : 0);
+
   const { budgetDetails, fetchBudgetDetails, invalidateBudgetDetails, invalidateBudgets, fetchBudgets, invalidateAccounts, fetchAccounts } = useData();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -31,6 +26,7 @@ export default function BudgetPage({
   const [activeTab, setActiveTab] = useState<"transactions" | "plans">("transactions");
 
   useEffect(() => {
+    if (!budgetId) return;
     setLoading(true);
     fetchBudgetDetails(budgetId)
       .catch(() => setError("Failed to load budget"));
@@ -96,13 +92,17 @@ export default function BudgetPage({
   return (
     <div className="phone-frame">
       <div className="screen-header">
-        <button onClick={onBack} className="header-action-btn">
-          Back
-        </button>
+        {!isCurrentMonth && (
+          <button onClick={() => navigate(-1)} className="header-action-btn">
+            Back
+          </button>
+        )}
+        {isCurrentMonth && (
+           <span className="w-12" />
+        )}
         <span className="header-title">{budget?.title || "Loading…"}</span>
 
         <button className="sketch-btn flex items-center gap-1 text-xs px-2 py-1"
-
           onClick={() => {
             setEditingTransaction(undefined);
             setShowForm(true);
@@ -182,25 +182,25 @@ export default function BudgetPage({
 
       {isCurrentMonth && (
         <div className="bottom-tab-bar bg-[#0f1115]/80 backdrop-blur-xl border-t border-white/5 px-2 py-3">
-          <button className="bottom-tab active flex flex-col items-center gap-1">
+          <button className="bottom-tab active flex flex-col items-center gap-1" onClick={() => navigate("/")}>
             <div className={`p-1.5 rounded-xl ${activeTab === 'transactions' ? 'bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))]' : 'text-gray-500'}`}>
               <Home size={18} strokeWidth={activeTab === 'transactions' ? 2.5 : 2} />
             </div>
-            <span className="text-[9px] font-bold uppercase tracking-wider">{budget?.title?.split(" ")[0]}</span>
+            <span className="text-[9px] font-bold uppercase tracking-wider">{budget?.title?.split(" ")[0] || "HOME"}</span>
           </button>
-          <button className="bottom-tab flex flex-col items-center gap-1 group" onClick={onShowSummary}>
+          <button className="bottom-tab flex flex-col items-center gap-1 group" onClick={() => navigate("/summary")}>
             <div className="p-1.5 rounded-xl group-hover:bg-white/5 text-gray-500 transition-all">
               <BarChart2 size={18} strokeWidth={2} />
             </div>
             <span className="text-[9px] font-bold uppercase tracking-wider">Stats</span>
           </button>
-          <button className="bottom-tab flex flex-col items-center gap-1 group" onClick={onShowAccounts}>
+          <button className="bottom-tab flex flex-col items-center gap-1 group" onClick={() => navigate("/accounts")}>
             <div className="p-1.5 rounded-xl group-hover:bg-white/5 text-gray-500 transition-all">
               <Landmark size={18} strokeWidth={2} />
             </div>
             <span className="text-[9px] font-bold uppercase tracking-wider">Accounts</span>
           </button>
-          <button className="bottom-tab flex flex-col items-center gap-1 group" onClick={onShowProfile}>
+          <button className="bottom-tab flex flex-col items-center gap-1 group" onClick={() => navigate("/profile")}>
             <div className="p-1.5 rounded-xl group-hover:bg-white/5 text-gray-500 transition-all">
               <User size={18} strokeWidth={2} />
             </div>

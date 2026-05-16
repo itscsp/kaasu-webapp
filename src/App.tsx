@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { BrowserRouter } from "react-router-dom";
 import { loadCredentials, clearCredentials, saveCredentials } from "@/lib/auth";
 import { onSessionExpired } from "@/lib/api";
 import LoginPage from "@/pages/LoginPage";
@@ -55,23 +56,25 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
-      {authState === "credentials" && (
-        isRegistering ? (
-          <RegisterPage 
-            onBack={() => setIsRegistering(false)}
-            onLoginSuccess={handleCredentialLogin}
-          />
-        ) : (
-          <LoginPage 
-            onLogin={handleCredentialLogin} 
-            onNavigateToRegister={() => setIsRegistering(true)}
-          />
-        )
-      )}
-      {authState === "home" && (
-        <HomePage onLogout={handleLogout} />
-      )}
-    </div>
+    <BrowserRouter>
+      <div className="app-shell">
+        {authState === "credentials" && (
+          isRegistering ? (
+            <RegisterPage 
+              onBack={() => setIsRegistering(false)}
+              onLoginSuccess={handleCredentialLogin}
+            />
+          ) : (
+            <LoginPage 
+              onLogin={handleCredentialLogin} 
+              onNavigateToRegister={() => setIsRegistering(true)}
+            />
+          )
+        )}
+        {authState === "home" && (
+          <HomePage onLogout={handleLogout} />
+        )}
+      </div>
+    </BrowserRouter>
   );
 }

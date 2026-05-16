@@ -1,18 +1,16 @@
 import { ChevronRight, LogOut, Tag as TagIcon, BarChart2, Archive } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
-  onBack: () => void;
-  onShowTags: () => void;
-  onShowSummary: () => void;
-  onShowArchive: () => void;
   onLogout: () => void;
 }
 
-export default function ProfilePage({ onBack, onShowTags, onShowSummary, onShowArchive, onLogout }: Props) {
+export default function ProfilePage({ onLogout }: Props) {
+  const navigate = useNavigate();
   return (
     <div className="phone-frame">
       <div className="screen-header">
-        <button onClick={onBack} className="header-action-btn">Back</button>
+        <button onClick={() => navigate(-1)} className="header-action-btn">Back</button>
         <span className="header-title">Profile</span>
         <span className="w-12" />
       </div>
@@ -20,9 +18,9 @@ export default function ProfilePage({ onBack, onShowTags, onShowSummary, onShowA
       <div className="screen-body py-6">
         <div className="flex flex-col gap-3">
           {[
-            { icon: BarChart2, label: "View Summary", action: onShowSummary, color: "text-blue-400" },
-            { icon: TagIcon, label: "Manage Tags", action: onShowTags, color: "text-purple-400" },
-            { icon: Archive, label: "View Archive", action: onShowArchive, color: "text-amber-400" },
+            { icon: BarChart2, label: "View Summary", action: () => navigate("/summary"), color: "text-blue-400" },
+            { icon: TagIcon, label: "Manage Tags", action: () => navigate("/tags"), color: "text-purple-400" },
+            { icon: Archive, label: "View Archive", action: () => navigate("/archive"), color: "text-amber-400" },
           ].map((item, i) => (
             <button 
               key={i}

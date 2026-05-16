@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useData } from "@/context/DataContext";
 
+import { useNavigate } from "react-router-dom";
+
 interface Props {
   budgetId?: number;
-  onBack: () => void;
 }
 
-export default function SummaryPage({ budgetId, onBack }: Props) {
+export default function SummaryPage({ budgetId }: Props) {
+  const navigate = useNavigate();
   const { budgetDetails, fetchBudgetDetails } = useData();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -27,7 +29,7 @@ export default function SummaryPage({ budgetId, onBack }: Props) {
   return (
     <div className="phone-frame">
       <div className="screen-header">
-        <button onClick={onBack} className="header-action-btn">Back</button>
+        <button onClick={() => navigate(-1)} className="header-action-btn">Back</button>
         <span className="header-title">Summary</span>
         <span className="w-12" />
       </div>

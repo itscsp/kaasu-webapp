@@ -64,6 +64,7 @@ export interface Account {
   description?: string;
   is_connected?: boolean;
   transaction_count?: number;
+  is_complete?: boolean;
 }
 
 export interface Transaction {
@@ -117,6 +118,7 @@ export interface AccountBody {
   group: "Cash" | "Accounts" | "Investment" | "Loan" | "Insurance" | "Saving";
   amount: number;
   description?: string;
+  is_complete?: boolean;
 }
 
 export interface PlanBody {

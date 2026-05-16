@@ -3,12 +3,10 @@ import { useEffect, useState } from "react";
 import { useData } from "@/context/DataContext";
 import { ChevronRight } from "lucide-react";
 
-interface Props {
-  onSelectBudget: (id: number) => void;
-  onBack: () => void;
-}
+import { useNavigate } from "react-router-dom";
 
-export default function ArchivePage({ onSelectBudget, onBack }: Props) {
+export default function ArchivePage() {
+  const navigate = useNavigate();
   const { budgets, fetchBudgets } = useData();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -29,7 +27,7 @@ export default function ArchivePage({ onSelectBudget, onBack }: Props) {
   return (
     <div className="phone-frame">
       <div className="screen-header">
-        <button onClick={onBack} className="header-action-btn">
+        <button onClick={() => navigate(-1)} className="header-action-btn">
           Back
         </button>
         <span className="header-title">Archives</span>
@@ -53,7 +51,7 @@ export default function ArchivePage({ onSelectBudget, onBack }: Props) {
             <button
               key={b.id}
               className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 mb-3 flex items-center justify-between hover:bg-white/10 transition-all active:scale-[0.98] group"
-              onClick={() => onSelectBudget(b.id)}
+              onClick={() => navigate(`/budget/${b.id}`)}
             >
               <div className="flex flex-col items-start gap-1">
                 <span className="text-base font-semibold text-gray-200 group-hover:text-white transition-colors">{b.title}</span>

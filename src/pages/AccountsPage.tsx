@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
-import { api, Account, Transaction, Tag } from "@/lib/api";
+import { api, Account } from "@/lib/api";
 import { useData } from "@/context/DataContext";
-import { Plus, Edit2, Trash2, Link as LinkIcon } from "lucide-react";
+import { Plus, Edit2, Trash2, Link as LinkIcon, CheckCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-interface Props {
-  onBack: () => void;
-}
-
-export default function AccountsPage({ onBack }: Props) {
+export default function AccountsPage() {
   const { accounts, fetchAccounts, invalidateAccounts } = useData();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -16,14 +14,9 @@ export default function AccountsPage({ onBack }: Props) {
   // form state
   const [name, setName] = useState("");
   const [group, setGroup] = useState<"Cash"|"Accounts"|"Investment"|"Loan"|"Insurance"|"Saving">("Accounts");
-  const [amount, setAmount] = useState(""); // This is Starting Balance in the form
+  const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
-
-  const [activeTab, setActiveTab] = useState<"details" | "transactions">("details");
-  const [accountTransactions, setAccountTransactions] = useState<Transaction[] | null>(null);
-  const [txLoading, setTxLoading] = useState(false);
-  const [viewingAccount, setViewingAccount] = useState<Account | null>(null);
 
   useEffect(() => {
     fetchAccounts().catch(() => setError("Failed to load accounts"));
@@ -35,16 +28,6 @@ export default function AccountsPage({ onBack }: Props) {
     }
   }, [accounts]);
 
-  useEffect(() => {
-    if (viewingAccount && accountTransactions === null) {
-      setTxLoading(true);
-      api.accounts.transactions(viewingAccount.id)
-        .then(setAccountTransactions)
-        .catch(() => {})
-        .finally(() => setTxLoading(false));
-    }
-  }, [viewingAccount, accountTransactions]);
-
   function resetForm() {
     setName("");
     setGroup("Accounts");
@@ -53,8 +36,6 @@ export default function AccountsPage({ onBack }: Props) {
     setEditingId(null);
     setShowForm(false);
     setError("");
-    setActiveTab("details");
-    setAccountTransactions(null);
   }
 
   function handleEdit(acc: Account) {
@@ -86,7 +67,7 @@ export default function AccountsPage({ onBack }: Props) {
         await api.accounts.update(editingId, {
           name: name.trim(),
           group,
-          amount: Number(amount), // Note: The backend currently maps 'amount' to '_bt_account_amount'
+          amount: Number(amount),
           description: description.trim() || undefined,
         });
       } else {
@@ -103,192 +84,6 @@ export default function AccountsPage({ onBack }: Props) {
     } catch (err: any) {
       setError(err.message || "Failed to save account");
     }
-  }
-
-  if (viewingAccount) {
-    const currentBalance = Number(viewingAccount.amount ?? viewingAccount.balance) || 0;
-    const startingBalance = Number(viewingAccount.starting_balance) || 0;
-    
-    // Group analysis
-    const isLiability = ['Loan', 'Insurance'].includes(viewingAccount.group);
-    const isInvestment = viewingAccount.group === 'Investment';
-
-    return (
-      <div className="phone-frame">
-        <div className="screen-header">
-          <button 
-            onClick={() => { setViewingAccount(null); setAccountTransactions(null); setActiveTab("details"); }} 
-            className="header-action-btn"
-          >
-            Back
-          </button>
-          <span className="header-title">{viewingAccount.name}</span>
-          <span className="w-12" />
-        </div>
-
-        <div className="tab-bar">
-          <button 
-            className={`tab-btn ${activeTab === 'details' ? 'tab-btn-active' : ''}`} 
-            onClick={() => setActiveTab("details")}
-          >
-            Details
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'transactions' ? 'tab-btn-active' : ''}`} 
-            onClick={() => setActiveTab("transactions")}
-          >
-            Transactions
-          </button>
-        </div>
-
-        <div className="screen-body">
-          {activeTab === "details" && (
-            <div className="flex flex-col gap-4 p-2">
-              <div className="sketch-box p-4 flex flex-col gap-3">
-                <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-gray-400 text-sm">Account Name</span>
-                  <span className="font-medium">{viewingAccount.name}</span>
-                </div>
-                <div className="flex justify-between border-b border-border pb-2">
-                  <span className="text-gray-400 text-sm">Group</span>
-                  <span className="font-medium">{viewingAccount.group}</span>
-                </div>
-                
-                {isLiability ? (
-                  <>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <span className="text-gray-400 text-sm">Starting Balance (Debt)</span>
-                      <span className="font-semibold text-[hsl(var(--destructive))]">
-                        ₹{startingBalance.toLocaleString()}
-                      </span>
-                    </div>
-                    {currentBalance < startingBalance && (
-                      <div className="flex justify-between border-b border-border pb-2">
-                        <span className="text-gray-400 text-sm">Total Paid</span>
-                        <span className="font-semibold text-[hsl(var(--primary))]">
-                          ₹{(startingBalance - currentBalance).toLocaleString()}
-                        </span>
-                      </div>
-                    )}
-                    {currentBalance > startingBalance && (
-                      <div className="flex justify-between border-b border-border pb-2">
-                        <span className="text-gray-400 text-sm">Additional Borrowing</span>
-                        <span className="font-semibold text-[hsl(var(--destructive))]">
-                          ₹{(currentBalance - startingBalance).toLocaleString()}
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <span className="text-gray-400 text-sm">Current Outstanding</span>
-                      <span className="font-semibold text-[hsl(var(--destructive))]">
-                        ₹{currentBalance.toLocaleString()}
-                      </span>
-                    </div>
-                  </>
-                ) : isInvestment ? (
-                  <>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <span className="text-gray-400 text-sm">Starting Investment</span>
-                      <span className="font-semibold text-[hsl(var(--primary))]">
-                        ₹{startingBalance.toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <span className="text-gray-400 text-sm">Current Value</span>
-                      <span className="font-semibold text-[hsl(var(--primary))]">
-                        ₹{currentBalance.toLocaleString()}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <span className="text-gray-400 text-sm">Starting Balance</span>
-                      <span className="font-semibold">
-                        ₹{startingBalance.toLocaleString()}
-                      </span>
-                    </div>
-                    <div className="flex justify-between border-b border-border pb-2">
-                      <span className="text-gray-400 text-sm">Current Balance</span>
-                      <span className={`font-semibold ${currentBalance >= 0 ? "text-[hsl(var(--primary))]" : "text-[hsl(var(--destructive))]"}`}>
-                        ₹{currentBalance.toLocaleString()}
-                      </span>
-                    </div>
-                  </>
-                )}
-                
-                <div className="flex flex-col gap-1">
-                  <span className="text-gray-400 text-sm">Description</span>
-                  <span className="text-sm">{viewingAccount.description || "No description provided."}</span>
-                </div>
-              </div>
-              
-              <button 
-                className="sketch-btn sketch-btn-primary flex justify-center items-center gap-2 mt-4"
-                onClick={() => {
-                  setViewingAccount(null);
-                  handleEdit(viewingAccount);
-                }}
-              >
-                <Edit2 size={16} /> Edit Account
-              </button>
-            </div>
-          )}
-
-          {activeTab === "transactions" && (
-            <div className="flex flex-col gap-2">
-              {txLoading && <p className="text-center text-sm text-gray-500 py-4">Loading transactions...</p>}
-              {!txLoading && accountTransactions && accountTransactions.length === 0 && (
-                <p className="text-center text-sm text-gray-500 py-4">No linked transactions.</p>
-              )}
-              {!txLoading && accountTransactions && accountTransactions.map(tx => {
-                // New logic: from = minus, to = plus (adjusted by group in backend, but here we just show the impact)
-                const isFrom = tx.from_account_id === viewingAccount.id;
-                const isTo = tx.to_account_id === viewingAccount.id;
-                
-                let multiplier = 0;
-                if (isTo) multiplier = isLiability ? -1 : 1;
-                if (isFrom) multiplier = isLiability ? 1 : -1;
-                
-                const impactAmount = Number(tx.amount) * multiplier;
-                const sign = impactAmount > 0 ? '+' : impactAmount < 0 ? '-' : '';
-                const colorClass = impactAmount > 0 ? "text-[hsl(var(--primary))]" : impactAmount < 0 ? "text-[hsl(var(--destructive))]" : "text-[hsl(var(--muted-foreground))]";
-                
-                const otherAccountId = isFrom ? tx.to_account_id : tx.from_account_id;
-                const otherAccount = otherAccountId ? accounts?.find(a => a.id === otherAccountId) : null;
-
-                return (
-                <div key={tx.id} className="sketch-box mb-2 overflow-hidden">
-                  <div className="flex items-center p-3">
-                    <div className="transaction-date-badge flex-shrink-0 mr-3">{new Date(tx.date).getDate()}</div>
-                    <div className="flex flex-col flex-grow min-w-0">
-                      <span className="text-sm font-medium text-[hsl(var(--foreground))] truncate">
-                        {tx.notes || (tx.type === 'transfer' ? "Transfer" : "No notes")}
-                      </span>
-                      {otherAccount && (
-                        <span className="text-[10px] text-[hsl(var(--muted-foreground))] mt-0.5 truncate">
-                          {isFrom ? "To |" : "From |"} {otherAccount.name}
-                        </span>
-                      )}
-                    </div>
-                    <div className={`text-sm font-semibold flex-shrink-0 ml-3 ${colorClass}`}>
-                      {sign}₹{Math.abs(impactAmount).toLocaleString()}
-                    </div>
-                  </div>
-                  {tx.tag_objects && tx.tag_objects.length > 0 && (
-                    <div className="px-3 pb-3 pt-1 flex flex-wrap gap-1 border-t border-[hsl(var(--border))] border-opacity-50">
-                      {tx.tag_objects.map((tag: Tag) => (
-                        <span key={tag.id} className="tag-badge text-[10px] py-[2px] px-2">{tag.name}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )})}
-            </div>
-          )}
-        </div>
-      </div>
-    );
   }
 
   if (showForm) {
@@ -352,7 +147,7 @@ export default function AccountsPage({ onBack }: Props) {
   return (
     <div className="phone-frame">
       <div className="screen-header">
-        <button onClick={onBack} className="header-action-btn">Back</button>
+        <button onClick={() => navigate("/")} className="header-action-btn">Back</button>
         <span className="header-title">Accounts</span>
         <button className="sketch-btn flex items-center gap-1 text-xs px-2 py-1" onClick={() => setShowForm(true)}>
           <Plus size={12} /> Add
@@ -379,10 +174,13 @@ export default function AccountsPage({ onBack }: Props) {
                   <div 
                     key={acc.id} 
                     className={`account-card account-card-${groupClass}`}
-                    onClick={() => setViewingAccount(acc)}
+                    onClick={() => navigate(`/accounts/${acc.id}`)}
                   >
                     <div className="account-info">
-                      <span className="account-name">{acc.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="account-name">{acc.name}</span>
+                        {acc.is_complete && <CheckCircle size={12} className="text-[hsl(var(--primary))]" />}
+                      </div>
                       <div className="account-meta">
                         <span className={`group-badge group-badge-${groupClass}`}>
                           {acc.group}
@@ -398,7 +196,7 @@ export default function AccountsPage({ onBack }: Props) {
                     
                     <div className="flex flex-col items-end">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="account-amount">
+                        <span className={`account-amount ${acc.is_complete ? 'opacity-50 line-through' : ''}`}>
                           ₹{(Number(acc.amount ?? acc.balance) || 0).toLocaleString()}
                         </span>
                         <div className="account-actions">
