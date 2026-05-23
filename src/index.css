@@ -748,3 +748,177 @@ button.tag-badge:hover {
     padding: 1px 6px;
   }
 }
+
+/* ── Floating Action Button (FAB) ── */
+.floating-add-btn {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: hsl(var(--primary));
+  color: #0f1115;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px hsla(var(--primary), 0.4);
+  border: none;
+  cursor: pointer;
+  z-index: 40;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-add-btn:hover {
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 6px 24px hsla(var(--primary), 0.6);
+}
+
+.floating-add-btn:active {
+  transform: scale(0.95) translateY(0);
+}
+
+/* ── Sliding Burger Menu Drawer ── */
+.burger-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.burger-menu-backdrop.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.burger-menu-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  max-width: 85%;
+  background: hsl(var(--card));
+  border-right: 1px solid hsl(var(--border));
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.burger-menu-drawer.open {
+  transform: translateX(0);
+}
+
+.burger-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.burger-menu-logo {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: hsl(var(--foreground));
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.burger-menu-logo span {
+  color: hsl(var(--primary));
+  text-shadow: 0 0 10px hsla(var(--primary), 0.3);
+}
+
+.burger-menu-close {
+  background: none;
+  border: none;
+  color: hsl(var(--muted-foreground));
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.burger-menu-close:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: hsl(var(--foreground));
+}
+
+.burger-menu-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.burger-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-family: inherit;
+}
+
+.burger-menu-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: hsl(var(--foreground));
+  padding-left: 18px;
+}
+
+.burger-menu-item.active {
+  background: hsla(var(--primary), 0.08);
+  color: hsl(var(--primary));
+  font-weight: 600;
+}
+
+.burger-menu-footer {
+  border-top: 1px solid hsl(var(--border));
+  padding-top: 16px;
+  margin-top: auto;
+}
+
+.burger-menu-logout {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  color: hsl(var(--destructive));
+  font-size: 0.95rem;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-family: inherit;
+}
+
+.burger-menu-logout:hover {
+  background: hsla(var(--destructive), 0.1);
+}

@@ -112,8 +112,8 @@ export default function HomePage({ onLogout }: Props) {
 
   return (
     <Routes>
-      <Route path="/" element={<BudgetPage budgetId={currentBudget.id} isCurrentMonth={true} />} />
-      <Route path="/budget/:id" element={<BudgetPage isCurrentMonth={false} />} />
+      <Route path="/" element={<BudgetPage budgetId={currentBudget.id} isCurrentMonth={true} onLogout={onLogout} />} />
+      <Route path="/budget/:id" element={<BudgetPage isCurrentMonth={false} onLogout={onLogout} />} />
       <Route path="/archive" element={<ArchivePage />} />
       <Route path="/tags" element={<TagsPage />} />
       <Route path="/accounts" element={<AccountsPage />} />

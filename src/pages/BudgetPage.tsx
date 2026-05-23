@@ -5,14 +5,15 @@ import { useData } from "@/context/DataContext";
 import TransactionItem from "@/components/TransactionItem";
 import TransactionForm from "@/components/TransactionForm";
 import PlansSection from "@/components/PlansSection";
-import { BarChart2, Home, Landmark, User } from "lucide-react";
+import { BarChart2, Home, Landmark, User, Menu, X, LogOut, Tag, Archive, Plus } from "lucide-react";
 
 interface Props {
   budgetId?: number;
   isCurrentMonth?: boolean;
+  onLogout?: () => void;
 }
 
-export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = false }: Props) {
+export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = false, onLogout }: Props) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   
@@ -24,6 +25,7 @@ export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = f
   const [editingTransaction, setEditingTransaction] = useState<Transaction | undefined>(undefined);
   const [showForm, setShowForm] = useState(false);
   const [activeTab, setActiveTab] = useState<"transactions" | "plans">("transactions");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!budgetId) return;
@@ -91,6 +93,102 @@ export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = f
 
   return (
     <div className="phone-frame">
+      {/* ── Sliding Navigation Drawer Backdrop & Overlay ── */}
+      <div className={`burger-menu-backdrop ${isMenuOpen ? "open" : ""}`} onClick={() => setIsMenuOpen(false)} />
+      <div className={`burger-menu-drawer ${isMenuOpen ? "open" : ""}`}>
+        <div className="burger-menu-header">
+          <div className="burger-menu-logo">
+            <span>Kaasu</span> App
+          </div>
+          <button className="burger-menu-close" onClick={() => setIsMenuOpen(false)}>
+            <X size={20} />
+          </button>
+        </div>
+
+        <nav className="burger-menu-links">
+          <button
+            className={`burger-menu-item ${isCurrentMonth && activeTab === "transactions" ? "active" : ""}`}
+            onClick={() => {
+              setIsMenuOpen(false);
+              navigate("/");
+            }}
+          >
+            <Home size={18} />
+            Tracker
+          </button>
+          
+          <button
+            className="burger-menu-item"
+            onClick={() => {
+              setIsMenuOpen(false);
+              navigate("/summary");
+            }}
+          >
+            <BarChart2 size={18} />
+            Stats
+          </button>
+
+          <button
+            className="burger-menu-item"
+            onClick={() => {
+              setIsMenuOpen(false);
+              navigate("/accounts");
+            }}
+          >
+            <Landmark size={18} />
+            Accounts
+          </button>
+
+          <button
+            className="burger-menu-item"
+            onClick={() => {
+              setIsMenuOpen(false);
+              navigate("/profile");
+            }}
+          >
+            <User size={18} />
+            Profile
+          </button>
+
+          <button
+            className="burger-menu-item"
+            onClick={() => {
+              setIsMenuOpen(false);
+              navigate("/tags");
+            }}
+          >
+            <Tag size={18} />
+            Tags
+          </button>
+
+          <button
+            className="burger-menu-item"
+            onClick={() => {
+              setIsMenuOpen(false);
+              navigate("/archive");
+            }}
+          >
+            <Archive size={18} />
+            Archive
+          </button>
+        </nav>
+
+        {onLogout && (
+          <div className="burger-menu-footer">
+            <button
+              className="burger-menu-logout"
+              onClick={() => {
+                setIsMenuOpen(false);
+                onLogout();
+              }}
+            >
+              <LogOut size={18} />
+              Logout
+            </button>
+          </div>
+        )}
+      </div>
+
       <div className="screen-header">
         {!isCurrentMonth && (
           <button onClick={() => navigate(-1)} className="header-action-btn">
@@ -98,17 +196,12 @@ export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = f
           </button>
         )}
         {isCurrentMonth && (
-           <span className="w-12" />
+          <button onClick={() => setIsMenuOpen(true)} className="header-action-btn flex items-center justify-center">
+            <Menu size={20} strokeWidth={2.5} />
+          </button>
         )}
         <span className="header-title">{budget?.title || "Loading…"}</span>
-
-        <button className="sketch-btn flex items-center gap-1 text-xs px-2 py-1"
-          onClick={() => {
-            setEditingTransaction(undefined);
-            setShowForm(true);
-          }}
-        ><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus "><path d="M5 12h14"></path><path d="M12 5v14"></path></svg> Add</button>
-
+        <span className="w-12" />
       </div>
 
       {summary && (
@@ -161,7 +254,7 @@ export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = f
           <>
             {transactions.length === 0 && (
               <p className="text-center text-sm text-gray-400 py-6">
-                No transactions yet. Tap Add to create one.
+                No transactions yet. Tap the plus button to create one.
               </p>
             )}
             {transactions.map((t) => (
@@ -180,34 +273,17 @@ export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = f
         )}
       </div>
 
-      {isCurrentMonth && (
-        <div className="bottom-tab-bar bg-[#0f1115]/80 backdrop-blur-xl border-t border-white/5 px-2 py-3">
-          <button className="bottom-tab active flex flex-col items-center gap-1" onClick={() => navigate("/")}>
-            <div className={`p-1.5 rounded-xl ${activeTab === 'transactions' ? 'bg-[hsl(var(--primary))]/10 text-[hsl(var(--primary))]' : 'text-gray-500'}`}>
-              <Home size={18} strokeWidth={activeTab === 'transactions' ? 2.5 : 2} />
-            </div>
-            <span className="text-[9px] font-bold uppercase tracking-wider">{budget?.title?.split(" ")[0] || "HOME"}</span>
-          </button>
-          <button className="bottom-tab flex flex-col items-center gap-1 group" onClick={() => navigate("/summary")}>
-            <div className="p-1.5 rounded-xl group-hover:bg-white/5 text-gray-500 transition-all">
-              <BarChart2 size={18} strokeWidth={2} />
-            </div>
-            <span className="text-[9px] font-bold uppercase tracking-wider">Stats</span>
-          </button>
-          <button className="bottom-tab flex flex-col items-center gap-1 group" onClick={() => navigate("/accounts")}>
-            <div className="p-1.5 rounded-xl group-hover:bg-white/5 text-gray-500 transition-all">
-              <Landmark size={18} strokeWidth={2} />
-            </div>
-            <span className="text-[9px] font-bold uppercase tracking-wider">Accounts</span>
-          </button>
-          <button className="bottom-tab flex flex-col items-center gap-1 group" onClick={() => navigate("/profile")}>
-            <div className="p-1.5 rounded-xl group-hover:bg-white/5 text-gray-500 transition-all">
-              <User size={18} strokeWidth={2} />
-            </div>
-            <span className="text-[9px] font-bold uppercase tracking-wider">Profile</span>
-          </button>
-        </div>
-      )}
+      {/* ── Glowing Floating Action Button (FAB) ── */}
+      <button
+        className="floating-add-btn"
+        onClick={() => {
+          setEditingTransaction(undefined);
+          setShowForm(true);
+        }}
+        title="Add Transaction"
+      >
+        <Plus size={24} strokeWidth={2.5} />
+      </button>
     </div>
   );
 }
