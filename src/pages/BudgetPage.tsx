@@ -5,7 +5,7 @@ import { useData } from "@/context/DataContext";
 import TransactionItem from "@/components/TransactionItem";
 import TransactionForm from "@/components/TransactionForm";
 import PlansSection from "@/components/PlansSection";
-import { BarChart2, Home, Landmark, User, Menu, X, LogOut, Tag, Archive, Plus } from "lucide-react";
+import { BarChart2, Home, Landmark, User, Menu, X, LogOut, Tag, Archive, Plus, Wallet } from "lucide-react";
 
 interface Props {
   budgetId?: number;
@@ -16,7 +16,7 @@ interface Props {
 export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = false, onLogout }: Props) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
+
   const budgetId = propsBudgetId ?? (id ? parseInt(id, 10) : 0);
 
   const { budgetDetails, fetchBudgetDetails, invalidateBudgetDetails, invalidateBudgets, fetchBudgets, invalidateAccounts, fetchAccounts } = useData();
@@ -49,7 +49,7 @@ export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = f
       invalidateBudgetDetails(budgetId);
       invalidateAccounts();
       await fetchBudgetDetails(budgetId, true);
-      fetchAccounts(true).catch(() => {});
+      fetchAccounts(true).catch(() => { });
     } catch (error) {
       console.error("Failed to delete transaction:", error);
     }
@@ -67,8 +67,8 @@ export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = f
     invalidateBudgets();
     invalidateAccounts();
     await fetchBudgetDetails(budgetId, true);
-    fetchBudgets(true).catch(() => {});
-    fetchAccounts(true).catch(() => {});
+    fetchBudgets(true).catch(() => { });
+    fetchAccounts(true).catch(() => { });
   }
 
   function handleFormBack() {
@@ -98,7 +98,8 @@ export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = f
       <div className={`burger-menu-drawer ${isMenuOpen ? "open" : ""}`}>
         <div className="burger-menu-header">
           <div className="burger-menu-logo">
-            <span>Kaasu</span> App
+            <Wallet size={22} className="text-[hsl(var(--primary))]" style={{ filter: "drop-shadow(0 0 6px hsla(var(--primary), 0.4))" }} />
+            <span>Kaas</span> App
           </div>
           <button className="burger-menu-close" onClick={() => setIsMenuOpen(false)}>
             <X size={20} />
@@ -116,7 +117,7 @@ export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = f
             <Home size={18} />
             Tracker
           </button>
-          
+
           <button
             className="burger-menu-item"
             onClick={() => {
