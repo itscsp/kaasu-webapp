@@ -198,7 +198,7 @@ export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = f
         )}
         {isCurrentMonth && (
           <button onClick={() => setIsMenuOpen(true)} className="header-action-btn flex items-center justify-center">
-            <Menu size={20} strokeWidth={2.5} />
+            <Menu size={30} strokeWidth={2.5} />
           </button>
         )}
         <span className="header-title">{budget?.title || "Loading…"}</span>
