@@ -78,7 +78,9 @@
 .phone-frame {
   width: 100%;
   max-width: 600px;
-  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
   background: hsl(var(--background));
   display: flex;
   flex-direction: column;
@@ -94,10 +96,7 @@
   }
 
   .phone-frame {
-    min-height: 100dvh;
-    max-height: 100dvh;
     border-radius: 0;
-    overflow: hidden;
     box-shadow: none;
   }
 }
