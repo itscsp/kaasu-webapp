@@ -5,7 +5,7 @@ import { useData } from "@/context/DataContext";
 import TransactionItem from "@/components/TransactionItem";
 import TransactionForm from "@/components/TransactionForm";
 import PlansSection from "@/components/PlansSection";
-import { BarChart2, Home, Landmark, User, Menu, X, LogOut, Tag, Archive, Plus, Wallet } from "lucide-react";
+import { BarChart2, Home, Landmark, User, Menu, X, LogOut, Tag, Archive, Plus, Wallet, SlidersHorizontal, Filter } from "lucide-react";
 
 interface Props {
   budgetId?: number;
@@ -26,6 +26,9 @@ export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = f
   const [showForm, setShowForm] = useState(false);
   const [activeTab, setActiveTab] = useState<"transactions" | "plans">("transactions");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const [sortBy, setSortBy] = useState<"date-desc" | "date-asc" | "amount-desc" | "amount-asc">("date-desc");
+  const [filterType, setFilterType] = useState<"all" | "income" | "expenses" | "transfer">("all");
 
   useEffect(() => {
     if (!budgetId) return;
@@ -87,9 +90,25 @@ export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = f
     );
   }
 
-  const transactions = [...(budget?.transactions || [])].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+  const transactions = [...(budget?.transactions || [])]
+    .filter((t) => {
+      if (filterType === "all") return true;
+      return t.type === filterType;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case "date-asc":
+          return new Date(a.date).getTime() - new Date(b.date).getTime();
+        case "amount-desc":
+          return (Number(b.amount) || 0) - (Number(a.amount) || 0);
+        case "amount-asc":
+          return (Number(a.amount) || 0) - (Number(b.amount) || 0);
+        case "date-desc":
+        default:
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+      }
+    });
+
 
   return (
     <div className="phone-frame">
@@ -253,11 +272,47 @@ export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = f
 
         {!loading && activeTab === "transactions" && (
           <>
-            {transactions.length === 0 && (
+            {/* Sleek Glassmorphic Filter & Sort Toolbar */}
+            <div className="flex gap-2.5 mb-4 bg-white/5 p-2 rounded-2xl border border-white/10 shadow-lg backdrop-blur-md">
+              <div className="flex-1 flex items-center gap-2 bg-white/5 px-3 py-2 rounded-xl border border-white/5 transition-all focus-within:border-[hsl(var(--primary))]/30">
+                <SlidersHorizontal size={14} className="text-gray-500 flex-shrink-0" />
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="bg-transparent text-xs text-gray-300 outline-none border-none w-full cursor-pointer font-medium"
+                >
+                  <option value="date-desc" className="bg-[#1c1f26]">Newest First</option>
+                  <option value="date-asc" className="bg-[#1c1f26]">Oldest First</option>
+                  <option value="amount-desc" className="bg-[#1c1f26]">Big to Small (₹)</option>
+                  <option value="amount-asc" className="bg-[#1c1f26]">Small to Big (₹)</option>
+                </select>
+              </div>
+
+              <div className="flex-1 flex items-center gap-2 bg-white/5 px-3 py-2 rounded-xl border border-white/5 transition-all focus-within:border-[hsl(var(--primary))]/30">
+                <Filter size={14} className="text-gray-500 flex-shrink-0" />
+                <select
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value as any)}
+                  className="bg-transparent text-xs text-gray-300 outline-none border-none w-full cursor-pointer font-medium"
+                >
+                  <option value="all" className="bg-[#1c1f26]">All Categories</option>
+                  <option value="income" className="bg-[#1c1f26]">Income</option>
+                  <option value="expenses" className="bg-[#1c1f26]">Expenses</option>
+                  <option value="transfer" className="bg-[#1c1f26]">Transfers</option>
+                </select>
+              </div>
+            </div>
+
+            {budget?.transactions && budget.transactions.length > 0 && transactions.length === 0 ? (
+              <p className="text-center text-sm text-gray-500 py-6">
+                No transactions match your filters.
+              </p>
+            ) : (!budget?.transactions || budget.transactions.length === 0) ? (
               <p className="text-center text-sm text-gray-400 py-6">
                 No transactions yet. Tap the plus button to create one.
               </p>
-            )}
+            ) : null}
+
             {transactions.map((t) => (
               <TransactionItem
                 key={t.id}

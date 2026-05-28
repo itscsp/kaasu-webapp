@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { api, Account, Transaction, Tag } from "@/lib/api";
 import { useData } from "@/context/DataContext";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, SlidersHorizontal, Filter } from "lucide-react";
 
 export default function AccountDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -14,8 +14,32 @@ export default function AccountDetailsPage() {
   const [txLoading, setTxLoading] = useState(false);
   const [completing, setCompleting] = useState(false);
 
+  const [sortBy, setSortBy] = useState<"date-desc" | "date-asc" | "amount-desc" | "amount-asc">("date-desc");
+  const [filterType, setFilterType] = useState<"all" | "income" | "expenses" | "transfer">("all");
+
   const accountId = id ? parseInt(id, 10) : null;
   const viewingAccount = accounts?.find(a => a.id === accountId) || null;
+
+  const processedTransactions = accountTransactions
+    ? [...accountTransactions]
+        .filter((tx) => {
+          if (filterType === "all") return true;
+          return tx.type === filterType;
+        })
+        .sort((a, b) => {
+          switch (sortBy) {
+            case "date-asc":
+              return new Date(a.date).getTime() - new Date(b.date).getTime();
+            case "amount-desc":
+              return (Number(b.amount) || 0) - (Number(a.amount) || 0);
+            case "amount-asc":
+              return (Number(a.amount) || 0) - (Number(b.amount) || 0);
+            case "date-desc":
+            default:
+              return new Date(b.date).getTime() - new Date(a.date).getTime();
+          }
+        })
+    : null;
 
   useEffect(() => {
     if (!accounts) {
@@ -211,51 +235,94 @@ export default function AccountDetailsPage() {
         {activeTab === "transactions" && (
           <div className="flex flex-col gap-2 p-2">
             {txLoading && <p className="text-center text-sm text-gray-500 py-4">Loading transactions...</p>}
-            {!txLoading && accountTransactions && accountTransactions.length === 0 && (
-              <p className="text-center text-sm text-gray-500 py-4">No linked transactions.</p>
-            )}
-            {!txLoading && accountTransactions && accountTransactions.map(tx => {
-              const isFrom = tx.from_account_id === viewingAccount.id;
-              const isTo = tx.to_account_id === viewingAccount.id;
-              
-              let multiplier = 0;
-              if (isTo) multiplier = isLiability ? -1 : 1;
-              if (isFrom) multiplier = isLiability ? 1 : -1;
-              
-              const impactAmount = Number(tx.amount) * multiplier;
-              const sign = impactAmount > 0 ? '+' : impactAmount < 0 ? '-' : '';
-              const colorClass = impactAmount > 0 ? "text-[hsl(var(--primary))]" : impactAmount < 0 ? "text-[hsl(var(--destructive))]" : "text-[hsl(var(--muted-foreground))]";
-              
-              const otherAccountId = isFrom ? tx.to_account_id : tx.from_account_id;
-              const otherAccount = otherAccountId ? accounts?.find(a => a.id === otherAccountId) : null;
-
-              return (
-              <div key={tx.id} className="sketch-box mb-2 overflow-hidden">
-                <div className="flex items-center p-3">
-                  <div className="transaction-date-badge flex-shrink-0 mr-3">{new Date(tx.date).getDate()}</div>
-                  <div className="flex flex-col flex-grow min-w-0">
-                    <span className="text-sm font-medium text-[hsl(var(--foreground))] truncate">
-                      {tx.notes || (tx.type === 'transfer' ? "Transfer" : "No notes")}
-                    </span>
-                    {otherAccount && (
-                      <span className="text-[10px] text-[hsl(var(--muted-foreground))] mt-0.5 truncate">
-                        {isFrom ? "To |" : "From |"} {otherAccount.name}
-                      </span>
-                    )}
+            {!txLoading && accountTransactions && (
+              <>
+                {/* Sleek Glassmorphic Filter & Sort Toolbar */}
+                <div className="flex gap-2.5 mb-2 bg-white/5 p-2 rounded-2xl border border-white/10 shadow-lg backdrop-blur-md">
+                  <div className="flex-1 flex items-center gap-2 bg-white/5 px-3 py-2 rounded-xl border border-white/5 transition-all focus-within:border-[hsl(var(--primary))]/30">
+                    <SlidersHorizontal size={14} className="text-gray-500 flex-shrink-0" />
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as any)}
+                      className="bg-transparent text-xs text-gray-300 outline-none border-none w-full cursor-pointer font-medium"
+                    >
+                      <option value="date-desc" className="bg-[#1c1f26]">Newest First</option>
+                      <option value="date-asc" className="bg-[#1c1f26]">Oldest First</option>
+                      <option value="amount-desc" className="bg-[#1c1f26]">Big to Small (₹)</option>
+                      <option value="amount-asc" className="bg-[#1c1f26]">Small to Big (₹)</option>
+                    </select>
                   </div>
-                  <div className={`text-sm font-semibold flex-shrink-0 ml-3 ${colorClass}`}>
-                    {sign}₹{Math.abs(impactAmount).toLocaleString()}
+
+                  <div className="flex-1 flex items-center gap-2 bg-white/5 px-3 py-2 rounded-xl border border-white/5 transition-all focus-within:border-[hsl(var(--primary))]/30">
+                    <Filter size={14} className="text-gray-500 flex-shrink-0" />
+                    <select
+                      value={filterType}
+                      onChange={(e) => setFilterType(e.target.value as any)}
+                      className="bg-transparent text-xs text-gray-300 outline-none border-none w-full cursor-pointer font-medium"
+                    >
+                      <option value="all" className="bg-[#1c1f26]">All Categories</option>
+                      <option value="income" className="bg-[#1c1f26]">Income</option>
+                      <option value="expenses" className="bg-[#1c1f26]">Expenses</option>
+                      <option value="transfer" className="bg-[#1c1f26]">Transfers</option>
+                    </select>
                   </div>
                 </div>
-                {tx.tag_objects && tx.tag_objects.length > 0 && (
-                  <div className="px-3 pb-3 pt-1 flex flex-wrap gap-1 border-t border-[hsl(var(--border))] border-opacity-50">
-                    {tx.tag_objects.map((tag: Tag) => (
-                      <span key={tag.id} className="tag-badge text-[10px] py-[2px] px-2">{tag.name}</span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )})}
+
+                {accountTransactions.length > 0 && processedTransactions && processedTransactions.length === 0 ? (
+                  <p className="text-center text-sm text-gray-500 py-6">
+                    No transactions match your filters.
+                  </p>
+                ) : accountTransactions.length === 0 ? (
+                  <p className="text-center text-sm text-gray-500 py-6">
+                    No linked transactions.
+                  </p>
+                ) : null}
+
+                {processedTransactions && processedTransactions.map(tx => {
+                  const isFrom = tx.from_account_id === viewingAccount.id;
+                  const isTo = tx.to_account_id === viewingAccount.id;
+                  
+                  let multiplier = 0;
+                  if (isTo) multiplier = isLiability ? -1 : 1;
+                  if (isFrom) multiplier = isLiability ? 1 : -1;
+                  
+                  const impactAmount = Number(tx.amount) * multiplier;
+                  const sign = impactAmount > 0 ? '+' : impactAmount < 0 ? '-' : '';
+                  const colorClass = impactAmount > 0 ? "text-[hsl(var(--primary))]" : impactAmount < 0 ? "text-[hsl(var(--destructive))]" : "text-[hsl(var(--muted-foreground))]";
+                  
+                  const otherAccountId = isFrom ? tx.to_account_id : tx.from_account_id;
+                  const otherAccount = otherAccountId ? accounts?.find(a => a.id === otherAccountId) : null;
+
+                  return (
+                    <div key={tx.id} className="sketch-box mb-2 overflow-hidden">
+                      <div className="flex items-center p-3">
+                        <div className="transaction-date-badge flex-shrink-0 mr-3">{new Date(tx.date).getDate()}</div>
+                        <div className="flex flex-col flex-grow min-w-0">
+                          <span className="text-sm font-medium text-[hsl(var(--foreground))] truncate">
+                            {tx.notes || (tx.type === 'transfer' ? "Transfer" : "No notes")}
+                          </span>
+                          {otherAccount && (
+                            <span className="text-[10px] text-[hsl(var(--muted-foreground))] mt-0.5 truncate">
+                              {isFrom ? "To |" : "From |"} {otherAccount.name}
+                            </span>
+                          )}
+                        </div>
+                        <div className={`text-sm font-semibold flex-shrink-0 ml-3 ${colorClass}`}>
+                          {sign}₹{Math.abs(impactAmount).toLocaleString()}
+                        </div>
+                      </div>
+                      {tx.tag_objects && tx.tag_objects.length > 0 && (
+                        <div className="px-3 pb-3 pt-1 flex flex-wrap gap-1 border-t border-[hsl(var(--border))] border-opacity-50">
+                          {tx.tag_objects.map((tag: Tag) => (
+                            <span key={tag.id} className="tag-badge text-[10px] py-[2px] px-2">{tag.name}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </>
+            )}
           </div>
         )}
       </div>

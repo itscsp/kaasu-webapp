@@ -82,6 +82,14 @@ export default function TransactionItem({ transaction, onEdit, onDelete }: Props
               ))}
             </div>
           )}
+          {transaction.notes && (
+            <div className="mb-3 bg-white/5 p-3 rounded-lg border border-white/5 flex flex-col gap-1.5 text-left">
+              <span className="text-[7px] font-bold uppercase tracking-widest text-gray-500">Description</span>
+              <p className="text-xs text-gray-300 max-h-24 overflow-y-auto whitespace-pre-wrap break-words pr-1">
+                {transaction.notes}
+              </p>
+            </div>
+          )}
           <div className="flex gap-2 mt-2">
             <button
               className="sketch-btn flex-1 py-1.5 text-xs"
