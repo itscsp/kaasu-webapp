@@ -16,7 +16,8 @@ export default function TransactionItem({ transaction, onEdit, onDelete }: Props
 
   const sign = transaction.type === "transfer" ? "" : transaction.type === "income" ? "+" : "-";
   const dateObj = new Date(transaction.date);
-  const day = dateObj.getDate();
+  const day = String(dateObj.getDate()).padStart(2, "0");
+  const monthShort = dateObj.toLocaleString("default", { month: "short" }).toUpperCase();
 
   const { accounts } = useData();
   const fromAccount = accounts?.find(a => a.id === transaction.from_account_id);
@@ -28,7 +29,10 @@ export default function TransactionItem({ transaction, onEdit, onDelete }: Props
         className="transaction-row"
         onClick={() => setExpanded((v) => !v)}
       >
-        <div className="transaction-date-badge">{day}</div>
+        <div className="transaction-date-badge flex flex-col items-center justify-center gap-0.5">
+          <span className="text-[7px] font-extrabold uppercase tracking-wider text-[hsl(var(--primary))] leading-none">{monthShort}</span>
+          <span className="text-sm font-bold leading-none mt-0.5">{day}</span>
+        </div>
         <div className="transaction-info">
           <div className="transaction-notes">
             {transaction.notes || (transaction.type === "transfer" ? "Transfer" : "No description")}
