@@ -293,10 +293,17 @@ export default function AccountDetailsPage() {
                   const otherAccountId = isFrom ? tx.to_account_id : tx.from_account_id;
                   const otherAccount = otherAccountId ? accounts?.find(a => a.id === otherAccountId) : null;
 
+                  const dateObj = new Date(tx.date);
+                  const day = String(dateObj.getDate()).padStart(2, "0");
+                  const monthShort = dateObj.toLocaleString("default", { month: "short" }).toUpperCase();
+
                   return (
                     <div key={tx.id} className="sketch-box mb-2 overflow-hidden">
                       <div className="flex items-center p-3">
-                        <div className="transaction-date-badge flex-shrink-0 mr-3">{new Date(tx.date).getDate()}</div>
+                        <div className="transaction-date-badge flex-shrink-0 mr-3 flex flex-col items-center justify-center gap-0.5" style={{ height: '44px', width: '44px' }}>
+                          <span className="text-[7px] font-extrabold uppercase tracking-wider text-[hsl(var(--primary))] leading-none">{monthShort}</span>
+                          <span className="text-sm font-bold leading-none mt-0.5">{day}</span>
+                        </div>
                         <div className="flex flex-col flex-grow min-w-0">
                           <span className="text-sm font-medium text-[hsl(var(--foreground))] truncate">
                             {tx.notes || (tx.type === 'transfer' ? "Transfer" : "No notes")}
