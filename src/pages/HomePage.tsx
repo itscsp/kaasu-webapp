@@ -9,6 +9,7 @@ import AccountsPage from "./AccountsPage";
 import AccountDetailsPage from "./AccountDetailsPage";
 import ProfilePage from "./ProfilePage";
 import SummaryPage from "./SummaryPage";
+import TransactionsPage from "./TransactionsPage";
 
 interface Props {
   onLogout: () => void;
@@ -118,6 +119,7 @@ export default function HomePage({ onLogout }: Props) {
       <Route path="/tags" element={<TagsPage />} />
       <Route path="/accounts" element={<AccountsPage />} />
       <Route path="/accounts/:id" element={<AccountDetailsPage />} />
+      <Route path="/transactions" element={<TransactionsPage />} />
       <Route path="/summary" element={<SummaryPage budgetId={currentBudget.id} />} />
       <Route path="/profile" element={<ProfilePage onLogout={onLogout} />} />
       <Route path="*" element={<Navigate to="/" replace />} />

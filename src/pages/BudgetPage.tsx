@@ -141,6 +141,17 @@ export default function BudgetPage({ budgetId: propsBudgetId, isCurrentMonth = f
             className="burger-menu-item"
             onClick={() => {
               setIsMenuOpen(false);
+              navigate("/transactions");
+            }}
+          >
+            <SlidersHorizontal size={18} />
+            Transactions
+          </button>
+
+          <button
+            className="burger-menu-item"
+            onClick={() => {
+              setIsMenuOpen(false);
               navigate("/summary");
             }}
           >
